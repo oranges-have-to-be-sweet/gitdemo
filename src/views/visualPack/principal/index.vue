@@ -2,9 +2,10 @@
   <div id="principal">
       <div class="form-content group-wrap-main" :style="{height:pageHeight+'px',overflow:'auto'}">
         <el-form>
-          <el-form-item>
+          <el-form-item style="margin:0;">
             <el-button
               class="el-icon-plus"
+              style="margin:20px 0;"
               type="primary"
               size="mini"
               @click="openDialog"
@@ -17,30 +18,25 @@
           :data="tableData"
           :height="tableHeight"
           style="width: 100%;"
-          :row-style="{ height: '40px' }"
+          :row-style="{ height: columnHeight }"
           :cell-style="{ padding: '0px' }"
           tooltip-effect="light"
           v-loading="tableLoading"
         >
-          <el-table-column prop="gardenInfo.emplName" align="center" label="姓名">
+          <el-table-column prop="emplName" align="center" label="姓名">
           </el-table-column>
-          <!-- <el-table-column  prop="sex" align="center" label="性别">
-            <template slot-scope="scope">
-              {{ scope.row.sex == 1 ? "男" : "女" }}
-            </template>
-          </el-table-column> -->
           <el-table-column
             show-overflow-tooltip
             align="center"
             label="所属园区"
           >
           <template slot-scope="scope">
-                <span v-for="(item,index) in scope.row.school" :key="item.id"> {{scope.row.school.length?(scope.row.school.length-1) == index?item.schoolName:item.schoolName +",":'空'}} </span>
+                <span v-for="(item,index) in scope.row.schools" :key="item.id"> {{scope.row.schools.length?(scope.row.schools.length-1) == index?item.schoolName:item.schoolName +",":'空'}} </span>
             </template>
           </el-table-column>
-          <el-table-column prop="gardenInfo.phone" align="center" label="手机号">
+          <el-table-column prop="phone" align="center" label="手机号">
           </el-table-column>
-          <el-table-column prop="gardenInfo.createTime" align="center" label="创建时间">
+          <el-table-column prop="createTime" align="center" label="创建时间">
           </el-table-column>
           <el-table-column align="center" label="操作" width="120">
             <template slot-scope="scope">
@@ -53,7 +49,6 @@
         </el-table>
       </div>
       <div class="paging-box">
-        <!-- <Pagination :total="total" @pageChange="pageChange" /> -->
         <Pagination
           v-show="total > 0"
           :total="total"
@@ -68,7 +63,6 @@
     <el-dialog
       title="新增园长"
       :visible.sync="dialogVisible"
-      :modal="false"
       :close-on-click-modal="false"
       width="500px"
       custom-class="add-dialog"
@@ -165,7 +159,6 @@ export default {
       dialogVisible: false,
       tableLoading: false,
       tableData: [],
-      upSwitch:false,
       searchForm: {
         userId: Number(sessionStorage.getItem("userId")),
         pageNum: 1,
@@ -219,26 +212,19 @@ export default {
       }
     };
   },
-  // computed:{
-  //   apiModel(){
-  //     console.log(sessionStorage.getItem('api_view_type'))
-  //     return sessionStorage.getItem('api_view_type')=='visualPack'?'parkManage':'kuaijiaowu'
-  //   }
-  // },
   methods: {
     refresh() {
       let _this = this;
-      _this.upSwitch = false;
       let options = Object.assign({}, _this.searchForm);
       console.log(options)
       _this.tableLoading = true;
-      api.parkManage
+      api.global
         .getPrincipalListApi(options)
         .then(res => {
           if (res.status == 200) {
             _this.tableLoading = false;
             _this.total = res.data.total;
-            _this.tableData = res.data;
+            _this.tableData = res.data.list;
             _this.searchForm.pageNum = res.data.pageNum;
             _this.searchForm.pageSize = res.data.pageSize;
           }
@@ -266,7 +252,7 @@ export default {
             text: "正在提交数据请稍后..."
           });
           options.password = md5(options.password);
-          api.parkManage.insertPrincipalApi(options).then(res => {
+          api.global.insertPrincipalApi(options).then(res => {
             if (res.status == 200) {
               load.close();
               this.$message({
@@ -280,8 +266,7 @@ export default {
               this.$message({
                 type: "warning",
                 message: "手机号已存在"
-              })
-              
+              });
               _this.dialogVisible = false;
               _this.refresh();
             }
@@ -292,7 +277,7 @@ export default {
     
     //获取关联列表
     openRelation(data) {
-      let datas = data.row.gardenInfo;
+      let datas = data.row;
       let _this = this;
      _this.relationDialog = true;
       let load = this.$loading({
@@ -306,15 +291,15 @@ export default {
       api.parkManage.getNullKindergartenApi({ compId: compId }).then(res => {
         if (res.status == 200) {
           console.log(res.data,'可关联的园区');
-          console.log(data.row.school,'已关联的园区');
+          console.log(data.row.schools,'已关联的园区');
           let resSchoolList = res.data;
-          let onlSchoolList = data.row.school;
-          if(data.row.school.length != 0) {
+          let onlSchoolList = data.row.schools;
+          if(data.row.schools.length != 0) {
             _this.parkList = [...resSchoolList, ...onlSchoolList]
           } else {
             _this.parkList = res.data;
           }
-          _this.relationForm.schoolList = data.row.school.map(item => item.id)
+          _this.relationForm.schoolList = data.row.schools.map(item => item.id)
           _this.$nextTick(() => {
             _this.$refs.relationForm.clearValidate();
           })
@@ -368,44 +353,7 @@ export default {
         // password:data.gardenInfo.password,
         leaderId: data.gardenInfo.userId
       };
-      this.upSwitch = true;
     },
-    // up_insertPrincipal(){
-    //   let _this = this;
-    //   this.$refs.up_ruleForm.validate(valid => {
-    //     if (valid) {
-    //       let options = Object.assign({}, _this.up_ruleForm);
-    //       // options.password = md5(options.password)
-    //       console.log(options,'编辑')
-    //       let load = this.$loading({
-    //         target: document.querySelector(".updata-dialog"),
-    //         text: "正在提交数据请稍后..."
-    //       });
-    //       api.parkManage.updataPrincipal(options).then(res => {
-    //         if (res.status == 200) {
-    //           _this.dialogVisible = false;
-    //           this.$message({
-    //             type: "success",
-    //             message: "编辑成功！"
-    //           });
-    //           load.close();
-    //           _this.refresh();
-    //         } else if (res.status == 2004) {
-    //           if (res.status == 2004) {
-    //             _this.$message({
-    //               type: "warning",
-    //               message: res.msg
-    //             });
-    //             load.close();
-    //           }
-    //         }else{
-    //           load.close();
-    //         }
-    //       });
-    //     }else
-    //     load.close();
-    //   });
-    // },
     pageChange(item) {
       this.searchForm.pageNum = item.pageIndex;
       this.searchForm.pageSize = item.pageSize;
@@ -413,9 +361,6 @@ export default {
     },
     getInfoData() {
       let id = sessionStorage.getItem("userId");
-      if (!this.userInfo) {
-        this.$store.dispatch("getUserInfo", { userId: id });
-      }
     }
   },
   computed: {
@@ -426,23 +371,21 @@ export default {
         return  window.innerHeight - 180;
       }
     },
+    columnHeight() {
+      return (this.tableHeight - 80) / 10 + "px";
+    },
     pageHeight(){
       if(window.innerHeight > 1336){
         return window.innerHeight - 140;
       }else{
-        return window.innerHeight - 60;
+        return window.innerHeight - 50;
       }
-    },
-    ...mapState({
-      userInfo(state) {
-        return state["module"].userInfo;
-      }
-    })
+    }
   },
   mounted() {
     this.refresh();
     console.log(this.$route.path, '----路由---')
-    console.log(this.userInfo, "xinxi");
+    // console.log(this.userInfo, "xinxi");
   },
   async created() {
     await this.getInfoData();

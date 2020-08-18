@@ -42,19 +42,10 @@ export const constantRoutes = [
     component: () => import('@/views/login/index1'),
     hidden: true
   },
-  // {
-  //   path: "/",
-  //   name: "111",
-  //   component: Layout,
-  //   redirect: "/packToMap",
-  //   meta:{
-  //     title:'111'
-  //   },
-  //   children:visualPack
-  // },
   {
     path: '/',
     component: Layout,
+    redirect:'/packToMap',
     children: [{
       path: '/packToMap',
       component: packToMap,
@@ -97,9 +88,15 @@ export const constantRoutes = [
     component: Layout,
     children: [{
       path: "/parkLocalMam",
-      name: "操作",
+      name: "园区管理",
       meta: { title: '园区管理', icon: 'el-icon-school'},
-      component: parkLocal //() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
+      component: parkLocal,
+      // children:[{
+      //     path: '/parkLocalMam/updata',
+      //     meta: { title: '编辑', icon: 'el-icon-school'},
+      //     component:() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
+      // }] 
+      //() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
     }]
   },
   {
@@ -117,9 +114,6 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-
   // {
   //   path: '/',
   //   component: Layout,
@@ -247,6 +241,8 @@ export const constantRoutes = [
   //     }
   //   ]
   // },
+  // 404 page must be placed at the end !!!
+  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

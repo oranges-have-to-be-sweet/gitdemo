@@ -20,7 +20,7 @@
           :data="tableData"
           :height="tableHeight"
           style="width: 100%;"
-          :row-style="{ height: '40px' }"
+          :row-style="{ height: columnHeight }"
           :cell-style="{ padding: '0px' }"
           tooltip-effect="light"
           v-loading="tableLoading"
@@ -108,11 +108,11 @@ export default {
       // console.log(val.row) 
       if (val) {
         this.$router.push({
-          path: "/api/kindergarten/list1/updata1",
+          path: "/parkLocalMam/updata",
           query: { kindergartenId: val.row.id }
         });
       } else {
-        this.$router.push("/api/kindergarten/list1/updata1");
+        this.$router.push("/parkLocalMam/updata");
       }
     },
     // publishCb(type) {
@@ -136,14 +136,17 @@ export default {
         return window.innerHeight - 180;
       }
     },
+    columnHeight() {
+      return (this.tableHeight - 80) / 10 + "px";
+    },
     pagePath() {
       return this.$route.path;
     },
-    ...mapState({
-      userInfo(state) {
-        return state["module"].userInfo;
-      }
-    })
+    // ...mapState({
+    //   userInfo(state) {
+    //     return state["module"].userInfo;
+    //   }
+    // })
   },
   async created() {
     await this.getInfoData();

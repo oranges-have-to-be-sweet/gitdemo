@@ -17,24 +17,6 @@ const parkManage = {
       params,
     });
   },
-  getPrincipalListApi(data) {
-    // 查询园长
-    return axios({
-      method: "POST",
-      contentType: "application/x-www-form-urlencoded",
-      url: "/park/getGardenLeaderData",
-      data: data,
-    });
-  },
-  //新增园长
-  insertPrincipalApi(data) {
-    return axios({
-      method: "POST",
-      contentType: "application/x-www-form-urlencoded",
-      url: "/park/addGardenLeader",
-      data: data,
-    });
-  },
   //关联的园区列表
   getNullKindergartenApi(data) {
     return axios({

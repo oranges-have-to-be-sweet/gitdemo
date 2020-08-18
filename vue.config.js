@@ -46,7 +46,7 @@ module.exports = {
         },
       },
       "/park": {
-        target: "http://218.244.149.172:8090",
+        target: "http://192.168.253.211:8090",
         changOrigin: true,
         pathRewrite: {
           "^/park": "/park"

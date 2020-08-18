@@ -1,12 +1,7 @@
 <template>
   <div id="statics">
     <div class="mt map">
-      <!-- <el-row>
-        <el-col style="margin:20px 0;">
-          
-        </el-col>
-      </el-row> -->
-      <chart :mapData="mapData"></chart>
+      <chart></chart>
     </div>
   </div>
 </template>
@@ -21,23 +16,7 @@ export default {
   },
   data() {
     return {
-      mapData:[],
-      mapStatus:false,
-      schoolStyle:3,
-      schoolType:[
-        {
-          label:'育幼通',
-          id:1
-        },
-        {
-          label:'快教务',
-          id:2
-        },
-        {
-          label:'全部',
-          id:3
-        }
-      ]
+      mapData:[]
     };
   },
   mounted() {
@@ -46,13 +25,12 @@ export default {
   methods: {
     getData(){
       let params = {
-        compId:sessionStorage.getItem('companyId'),
-        userId:sessionStorage.getItem('userId'),
-        schoolStyle:1
+        compId:sessionStorage.getItem('companyId')
       }
+      if(this.schoolStyle) params.schoolStyle = this.schoolStyle;
       api.global.getAllLngLatListApi(params).then((res) => {
         if( res.status == 200 ){
-          // console.log('----获取园区信息----',res.data)
+          console.log('----获取园区信息----',res.data)
           if(res.data.length){
             this.mapData = res.data.map(item => {
               return {

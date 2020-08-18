@@ -2,7 +2,7 @@
   <div
     id="updataParkLocal"
     class="group-wrap-main"
-    v-if="pagePath == '/api/kindergarten/list1/updata1'"
+    v-if="pagePath == '/parkLocalMam/updata'"
     :style="{height:pageHeight+'px',overflow:'auto'}"
   >
     <el-form

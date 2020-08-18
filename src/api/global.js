@@ -1,6 +1,7 @@
 import axios from "@/utils/http";
 
 const global = {
+  //文件图片上传
   uploadFileApi(data) {
     return axios({
       contentType: "multipart/form-data",
@@ -33,6 +34,51 @@ const global = {
       method: "GET",
       contentType: "application/x-www-form-urlencoded",
       url: "/public/selectOneSchool",
+      params: data
+    });
+  },
+  getPrincipalListApi(data) {
+    // 查询园长
+    return axios({
+      method: "POST",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/park/getGardenLeaderData",
+      data: data,
+    });
+  },
+  //新增园长
+  insertPrincipalApi(data) {
+    return axios({
+      method: "POST",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/park/addGardenLeader",
+      data: data,
+    });
+  },
+  //公共查询教师考勤
+  getSearhTeaApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectTeaAttend",
+      params: data
+    });
+  },
+  //公共查询学生考勤
+  getSearhStuApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectStuAttend",
+      params: data
+    });
+  },
+  //公共查询招生情况
+  getSearhGetStuApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectInvitation",
       params: data
     });
   },

@@ -2,7 +2,7 @@
   <div>
     <baidu-map
       class="bm-view"
-      :center="{lng:116.404035, lat:39.916322 }"
+      :center="{lng:116.404, lat:39.916 }"
       :zoom="zoom"
       @ready="handler"
       :scroll-wheel-zoom="true"
@@ -10,7 +10,7 @@
     >
       <!--地图类型-->
       <bm-control class="select">
-        <el-select v-model="schoolStyle" placeholder="请选择">
+        <el-select v-model="schoolStyle" placeholder="请选择" @change="getData">
           <el-option
             v-for="item in schoolType"
             :key="item.id"
@@ -28,10 +28,8 @@
       <!--标注点  animation="BMAP_ANIMATION_BOUNCE"-->
       <div v-for="marker in markers" :key="marker.lng">
         <bm-marker
-          dragging
           :position="{lng: marker.lng, lat: marker.lat}"
-          @click="markerClick(marker)"
-          :icon="{url: 'http://api0.map.bdimg.com//images/hd_red_marker.png', size: {width: 20, height: 20}}"
+          :icon="{url: 'http://api0.map.bdimg.com//images/hd_red_marker.png', size: {width: 40, height: 50}}"
         ></bm-marker>
         <bm-label
           :content="marker.content"
@@ -46,6 +44,7 @@
   </div>
 </template>
 <script>
+  import api from '@/api';
   export default {
     props:{
       mapData:{
@@ -56,19 +55,27 @@
       return {
         zoom: 5,
         index:1,
-        show:true
+        show:true,
+        markers:[],
+        schoolStyle:0,
+        schoolType:[
+          {
+            label:'全部',
+            id:0
+          },
+          {
+            label:'育幼通',
+            id:1
+          },
+          {
+            label:'快教务',
+            id:2
+          }
+        ]
       }
-    },
-    computed:{
-      markers(){
-          return this.mapData;
-      }
-    },
-    created(){
     },
     mounted(){
-      // this.markers = this.mapData;
-      // console.log(this.markers,"--------------")
+      this.getData();
     },
     methods: {
       draw ({el, BMap, map}) {
@@ -88,11 +95,33 @@
       },
       infoWindowClose(){
         this.show = false
-      }
+      },
+      getData(){
+        let load = this.$loading({
+          target:document.querySelector('.bm-view'),
+          text:'加载中...'
+        })
+        let params = {
+          compId:sessionStorage.getItem('companyId')
+        }
+        if(this.schoolStyle) params.schoolStyle = this.schoolStyle;
+        api.global.getAllLngLatListApi(params).then((res) => {
+          if( res.status == 200 ){
+            console.log('----获取园区信息----',res.data);
+            if(res.data.school.length){
+              this.markers = res.data.school.map(item => {
+                return {
+                  lat:Number(item.latitude),
+                  lng:Number(item.longitude),
+                  content:item.schoolName || ""
+                }
+              })
+            };
+            load.close();
+          }
+        })
+      },
     },
-    // destroyed() {
-
-    // },
   }
 </script>
 
