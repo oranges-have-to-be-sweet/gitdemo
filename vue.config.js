@@ -27,16 +27,60 @@ module.exports = {
   publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
-  lintOnSave: process.env.NODE_ENV === 'development',
+  lintOnSave: false, //process.env.NODE_ENV === 'development'
   productionSourceMap: false,
   devServer: {
     port: port,
     open: true,
+    proxy: {
+      // 218.244.149.172 
+      // 192.168.253.161
+      // 182.92.104.216
+      // 121.37.133.8
+      // 192.168.253.211
+      "/login": {
+        target: "http://218.244.149.172:8086",
+        changOrigin: true,
+        pathRewrite: {
+          "^/login": "/login"
+        },
+      },
+      "/park": {
+        target: "http://218.244.149.172:8090",
+        changOrigin: true,
+        pathRewrite: {
+          "^/park": "/park"
+        },
+      },
+      "/public": {
+        target: "http://192.168.253.211:8089",
+        changOrigin: true,
+        pathRewrite: {
+          "^/public": "/public"
+        },
+      },
+      // 192.168.253.53
+      // 116.62.107.142
+      "/pc/kjwcommon": {
+        target: "http://192.168.253.53:8072",
+        changOrigin: true,
+        pathRewrite: {
+          "^/pc/kjwcommon": ""
+        }
+      },
+      "/pc/kjw": {
+        target: "http://192.168.253.53:8084",
+        changOrigin: true,
+        pathRewrite: {
+          "^/pc/kjw": ""
+        },
+      }
+    },
     overlay: {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
