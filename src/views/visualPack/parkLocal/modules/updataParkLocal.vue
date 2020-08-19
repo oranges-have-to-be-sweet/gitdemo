@@ -37,7 +37,7 @@
           >
           </el-tree>
         </el-form-item>
-        <el-form-item v-if="appList.length" label="App权限：" prop="appList" class="tree-box">
+        <el-form-item v-if="ruleForm.schoolStyle==1" label="App权限：" prop="appList" class="tree-box">
           <el-tree
             :style="{ height: treeHeight + 'px' }"
             :data="appList"
@@ -89,14 +89,14 @@ export default {
           message: "请输入园区地址！",
           trigger: "change"
         },
-        appList: [
-          {
-            type: "array",
-            required: true,
-            message: "请至少分配App一个权限！",
-            trigger: "blur"
-          }
-        ],
+        // appList: [
+        //   {
+        //     type: "array",
+        //     required: true,
+        //     message: "请至少分配App一个权限！",
+        //     trigger: "blur"
+        //   }
+        // ],
         pcList: [
           {
             type: "array",
@@ -170,22 +170,26 @@ export default {
                   _this.ruleForm = {
                     userId: Number(sessionStorage.getItem("userId")),
                     compId:Number(sessionStorage.getItem("companyId")),
+                    schoolStyle:this.ruleForm.schoolStyle,
                     schoolName:res.data.school.schoolName,
-                    appList: res.data.app,
                     pcList: res.data.pc,
                     address:res.data.school.address,
                     longitude:res.data.school.longitude,
                     latitude:res.data.school.latitude,
-                    schoolStyle:this.schoolStyle,
                     id
+                  };
+                  if(_this.ruleForm.schoolStyle==1){
+                    _this.ruleForm.appList=res.data.app;
                   };
                   _this.center = {
                     lat:res.data.school.latitude,
                     lng:res.data.school.longitude
                   };
-                  _this.$refs.appTree.setCheckedKeys(
-                    res.data.app
-                  );
+                  if(_this.ruleForm.schoolStyle==1){
+                    _this.$refs.appTree.setCheckedKeys(
+                      res.data.app
+                    );
+                  }
                   _this.$refs.pcTree.setCheckedKeys(
                     res.data.pc
                   );
@@ -215,12 +219,13 @@ export default {
     },
     getAppTree() {
       let appList = this.$refs.appTree.getCheckedNodes(false, true).map(item => item.id);
+      
       return appList
     },
     insertParkLocal() {
       let _this = this;
       _this.ruleForm.pcList = _this.getPCTree();
-      if(_this.schoolStyle==2){
+      if(_this.ruleForm.schoolStyle==1){
         _this.ruleForm.appList = _this.getAppTree();
       }
       let load = _this.$loading({
@@ -237,6 +242,10 @@ export default {
           if (_this.$route.query.kindergartenId) {
             options.schoolId=Number(_this.$route.query.kindergartenId);
             delete options.kindergartenId;
+            if(_this.ruleForm.schoolStyle==2){
+              delete options.appList;
+              options.pcList.shift();
+            }
             console.log(options,"编辑");
             api.global
               .updataParkApi(options)
@@ -258,13 +267,14 @@ export default {
               })
               .catch(err => {
                 load.close();
-                _this.$message.error({
-                  message: err.msg
-                });
               });
           } else {
             delete options.kindergartenId;
             delete options.kindergartenName;
+            if(_this.ruleForm.schoolStyle==2){
+              delete options.appList;
+              options.pcList.shift();
+            }
             api.global
               .insertPark(options)
               .then(res => {
@@ -285,9 +295,6 @@ export default {
               })
               .catch(err => {
                 load.close();
-                _this.$message.error({
-                  message: err.msg
-                });
               });
           }
         } else {
@@ -315,8 +322,8 @@ export default {
             if (res.status == 200) {
               _this.appList = res.data;
               _this.findHasParentIds(res.data);
-              reslove(res)
             }
+            reslove(res)
           })
         })
       })
@@ -388,7 +395,7 @@ export default {
     }
   },
   mounted() {
-    this.schoolStyle = this.$route.query.schoolStyle;
+    this.ruleForm.schoolStyle = this.$route.query.schoolStyle;
     this.initPage();
   }
 };
@@ -406,7 +413,7 @@ export default {
   width: 45%;
   float: left;
   v::deep .el-tree {
-    overflow-y: auto;
+    overflow-y: auto !important;
   }
 }
 .btn-box {

@@ -38,7 +38,7 @@
           </el-table-column>
           <el-table-column prop="isDel" align="center" label="是否启用">
             <template slot-scope="scope">
-              <el-switch v-model="!scope.row.isDel">
+              <el-switch :active-value='scope.row.isDel==1' :inactive-value='scope.row.isDel==0' @change="updateDel(scope)">
               </el-switch>
             </template>
           </el-table-column>
@@ -235,6 +235,31 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    updateDel(val){
+      let _this =this;
+      api.global.updataDel({userId:val.row.userId}).then(res=>{
+        if(res.status==200){
+          if(val.row.isDel==0){
+            _this.$message({
+              type:'success',
+              message:'禁用成功'
+            });
+            _this.refresh();
+          }else{
+            _this.$message({
+              type:'success',
+              message:'启用成功'
+            })
+            _this.refresh();
+          }
+        }else{
+          _this.$message({
+            type:'error',
+            message:res.msg
+          })
+        }
+      })
     },
     openDialog() {
       this.ruleForm = {

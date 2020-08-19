@@ -1,8 +1,18 @@
 <template>
   <div id="parkLocal">
     <div class="group-wrap-main" v-show="pagePath == '/parkLocalMam'">
-      <div class="form-content" :style="{height:pageHeight+'px',overflow:'auto'}">
-        <el-form> 
+      <div class="form-content">
+        <el-form inline size="mini">
+          <el-form-item>
+            <el-select v-model="searchForm.schoolStyle" placeholder="请选择">
+              <el-option
+                v-for="item in schoolType"
+                :key="item.id"
+                :label="item.label"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
           <el-form-item>
             <el-button
               class="el-icon-plus"
@@ -31,7 +41,12 @@
             label="园区名称"
           >
           </el-table-column>
-          <el-table-column prop="schoolNo" align="center" label="园区编码">
+          <!-- <el-table-column prop="schoolNo" align="center" label="园区编码">
+          </el-table-column> -->
+          <el-table-column prop="schoolStyle" align="center" label="学校类型">
+            <template slot-scope="scope">
+              {{scope.row.schoolStyle==1?'育幼通':'快教务'}}
+            </template>
           </el-table-column>
           <el-table-column prop="createTime" align="center" label="创建时间">
           </el-table-column>
@@ -46,6 +61,11 @@
             <template slot-scope="scope">
               <el-button size="mini" type="text" @click="updata(scope)">
                 编辑
+              </el-button>
+              <el-button size="mini" type="text" @click="goLogin(scope)">
+                <a :href="hrefUrl" target='_blank'>
+                  跳转并登录
+                </a>
               </el-button>
             </template>
           </el-table-column>
@@ -74,11 +94,12 @@ export default {
     return {
       total: 0,
       tableLoading: false,
+      hrefUrl:'',
       tableData: [],
       searchForm: {
         compId: Number(sessionStorage.getItem("companyId")),
         userId: Number(sessionStorage.getItem("userId")),
-        schoolStyle:1,
+        schoolStyle:3,
         pageNum: 1,
         pageSize: 10
       }
@@ -89,6 +110,7 @@ export default {
       let _this = this;
       let options = Object.assign({}, _this.searchForm);
       _this.tableLoading = true;
+      console.log(options)
       api.global
         .getAllParkListApi(options)
         .then(res => {
@@ -115,27 +137,30 @@ export default {
         this.$router.push("/parkLocalMam/updata");
       }
     },
-    // publishCb(type) {
-    //   // 发布
-    //   if (type == "parkLocal") {
-    //     this.refresh();
-    //   }
-    // },
+    goLogin(val){
+      let token = sessionStorage.getItem('token');
+      let userId = sessionStorage.getItem('userId');
+      let yyt_devHref = process.env.VUE_APP_HREF_YYT + `?banXueToken=${token}&userId=${userId}`;
+      let kjw_Href = process.env.VUE_APP_HREF_KJW + `?banXueToken=${token}&userId=${userId}`;
+      this.hrefUrl = val.row.schoolStyle==1?yyt_devHref:kjw_Href;
+      
+    },
     getInfoData() {
       let id = sessionStorage.getItem("userId");
-      // if (!this.userInfo) {
-      //   this.$store.dispatch("getUserInfo", { userId: id });
-      // }
+    }
+  },
+  watch:{
+    'searchForm.schoolStyle':{
+      handler(val){
+        this.refresh()
+      },
+      deep:true
     }
   },
   computed: {
-    // pageHeight() {
-    //   if(window.innerHeight > 1336){
-    //     return window.innerHeight - 360;
-    //   }else{
-    //     return window.innerHeight - 900;
-    //   }
-    // },
+    ...mapState({
+      schoolType: state => state["global"].schoolType, 
+    }),
     tableHeight() {
       if(window.innerHeight > 1336){
         return window.innerHeight - 200;
@@ -148,19 +173,12 @@ export default {
     },
     pagePath() {
       return this.$route.path;
-    },
-    // ...mapState({
-    //   userInfo(state) {
-    //     return state["module"].userInfo;
-    //   }
-    // })
+    }
   },
   async created() {
     await this.getInfoData();
   },
   mounted() {
-    // 在此订阅
-    // this.subscribe("parkLocal");
     this.refresh();
   },
   components: {

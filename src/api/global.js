@@ -189,6 +189,14 @@ const global = {
       params,
     });
   },
+  updataDel(params){
+    // 获取快教务后台权限列表
+    return axios({
+      method: "get",
+      url: "/park/updateUserIsDel",
+      params
+    });
+  }
 };
 
 export default global;
