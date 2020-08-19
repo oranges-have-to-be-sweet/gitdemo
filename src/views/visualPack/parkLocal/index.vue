@@ -1,8 +1,8 @@
 <template>
   <div id="parkLocal">
     <div class="group-wrap-main" v-show="pagePath == '/parkLocalMam'">
-      <div class="form-content">
-        <el-form>
+      <div class="form-content" :style="{height:pageHeight+'px',overflow:'auto'}">
+        <el-form> 
           <el-form-item>
             <el-button
               class="el-icon-plus"
@@ -105,11 +105,11 @@ export default {
         });
     },
     updata(val) {
-      // console.log(val.row) 
+      console.log(val.row) 
       if (val) {
         this.$router.push({
           path: "/parkLocalMam/updata",
-          query: { kindergartenId: val.row.id }
+          query: { kindergartenId: val.row.id ,schoolStyle:val.row.schoolStyle}
         });
       } else {
         this.$router.push("/parkLocalMam/updata");
@@ -129,11 +129,18 @@ export default {
     }
   },
   computed: {
+    // pageHeight() {
+    //   if(window.innerHeight > 1336){
+    //     return window.innerHeight - 360;
+    //   }else{
+    //     return window.innerHeight - 900;
+    //   }
+    // },
     tableHeight() {
       if(window.innerHeight > 1336){
         return window.innerHeight - 200;
       }else{
-        return window.innerHeight - 180;
+        return window.innerHeight - 220;
       }
     },
     columnHeight() {
@@ -162,4 +169,9 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.group-wrap-main{
+  width: 96%;
+  padding: 20px 2%;
+}
+</style>

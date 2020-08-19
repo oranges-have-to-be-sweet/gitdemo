@@ -17,21 +17,12 @@ const parkManage = {
       params,
     });
   },
-  //关联的园区列表
-  getNullKindergartenApi(data) {
+  getKJWBack(params) {
+    // 获取后台权限列表
     return axios({
-      method: "POST",
-      contentType: "application/x-www-form-urlencoded",
-      url: "/park/selectSchoolList",
-      data: data,
-    });
-  },
-  relationParkApi(data) {
-    return axios({
-      method: "POST",
-      contentType: "application/x-www-form-urlencoded",
-      url: "/park/updategardenfrom",
-      data: data,
+      method: "get",
+      url: "/pc/kjw/school/backgroundPermission",
+      params,
     });
   },
   getParkDetailsApi(data) {

@@ -1,24 +1,31 @@
 <template>
   <div id="statics">
-    <div class="topline">
-      <div class="block">
-        <el-date-picker value-format="yyyy-MM" class="w180x dib" v-model="time" :clearable="false" type="month" size="mini" placeholder="选择日期"></el-date-picker>
-      </div>
-    <el-select size="mini" class="w180x dib ml" v-model="schoolId"  placeholder="请选择">
-      <el-option v-for="item in options" :key="item.id" :label="item.schoolName" :value="item.id"></el-option>
-    </el-select>
-    <el-button class="dib ml mb mleft" size="mini" @click="getData">查询</el-button>
+    <div class="topMoudule">
+      <el-date-picker value-format="yyyy-MM" class="w180x dib" v-model="time" :clearable="false" type="month" size="mini" placeholder="选择日期"></el-date-picker>
+      <el-select size="mini" class="w180x dib ml mr" v-model="schoolStyle" placeholder="请选择">
+        <el-option v-for="item in schoolType" :key="item.id"  align="center" :label="item.label" :value="item.id"></el-option>
+      </el-select>
+      <el-select size="mini" class="w180x dib ml" v-model="schoolId"  placeholder="请选择">
+        <el-option v-for="item in options" :key="item.id" :label="item.schoolName" :value="item.id"></el-option>
+      </el-select>
+      <el-button class="dib" size="mini" @click="getData">查询</el-button>
     </div>
-    <div class="mt">
-      <chart v-if="chartData" width="80%" :chartData="chartData" height="600px"></chart>
-      <div v-else class="nullData">暂无数据</div>
-    </div>
-    <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="status1" align="center" label="已入园（人）" > </el-table-column>
-      <el-table-column prop="status2" align="center" label="未入园（人）" > </el-table-column>
-      <el-table-column prop="status3" align="center" label="拒收（人）" > </el-table-column>
-      <el-table-column prop="sumStatus" align="center" label="总计（人）" > </el-table-column>
-    </el-table>
+    <el-row>
+      <el-col :span="11" :offset="1">
+        <div class="mt">
+          <chart v-if="chartData" width="80%" :chartData="chartData" height="600px"></chart>
+          <div v-else class="nullData">暂无数据</div>
+        </div>
+      </el-col>
+      <el-col :span="11">
+        <el-table :data="tableData" border style="width: 100%">
+          <el-table-column prop="alreadyEntered" align="center" label="已入园（人）" > </el-table-column>
+          <el-table-column prop="notEntered" align="center" label="未入园（人）" > </el-table-column>
+          <el-table-column prop="rejection" align="center" label="拒收（人）" > </el-table-column>
+          <el-table-column prop="badLuck" align="center" label="总计（人）" > </el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
   </div>
 </template>
 <script>
@@ -38,11 +45,24 @@ export default {
       step:0,
       schoolId:'',
       options:[],
-      chartData:[]
+      chartData:[],
+      schoolStyle:1
     };
   },
-  computed: {
-
+  computed:{
+    ...mapState({
+      schoolType: state => state["global"].schoolType, 
+    }) 
+  },
+  watch:{
+    schoolStyle:{
+      handler(val){
+        this.options = [];
+        this.schoolId = '';
+        this.getOptions()
+      },
+      immediate:true
+    }
   },
   created(){
     this.getOptions();
@@ -54,39 +74,47 @@ export default {
     this.time = str;
     this.step = 1 ; 
     this.getOptions().then((res) => {
-      this.schoolId = res.data[res.data.length-1].id
+      this.schoolId = res.data[0].id
       this.step = 2 ; 
       this.getData()
     });
   },
   methods: {
     getData(){
-      let params = {startTime:this.time,schoolId:this.schoolId};
+      let params = {
+        compId:Number(sessionStorage.getItem('companyId')),
+        schoolId:this.schoolId,
+        startTime:this.time + '-01',
+        schoolStyle:this.schoolStyle,
+        pageNum:1,
+        pageSize:10
+      };
       if(this.time == '' ||  this.schoolid == ''){
         this.$message({
           message:"请选择日期和学校"
         })
         return
       }
-      api.visualPack.getStudentsView(params).then((res) => {
+      api.global.getSelectGetStuApi(params).then((res) => {
+        console.log(res.data);
         if(res.status == 200){
           console.log('-----------招生情况---------',res.data)
           let arr = [
             {
               name:'已入园',
-              value:res.data[0].status1?res.data[0].status1:'0'
+              value:res.data.alreadyEntered?res.data.alreadyEntered:'0'
             },
             {
               name:'未入园',
-              value:res.data[0].status2?res.data[0].status2:'0'
+              value:res.data.notEntered?res.data.notEntered:'0'
             },
             {
               name:'拒收',
-              value:res.data[0].status3?res.data[0].status3:'0'
+              value:res.data.rejection?res.data.rejection:'0'
             }
           ];
           this.chartData = arr;
-          this.tableData = res.data
+          this.tableData = res.data.info.list;
         }
       })
     },
@@ -95,12 +123,17 @@ export default {
         let params = {
           userid:Number(sessionStorage.getItem('userId')),
           compId:Number(sessionStorage.getItem('companyId')),
-          schoolStyle:1
+          schoolStyle:this.schoolStyle
         }
         api.global.getParkSelectApi(params).then((res) => {
-          if(res.status){
-            console.log('-----------学校列表---------',res)
-            this.options = res.data;
+          if(res.status == 200){
+            console.log('-----------学校列表---------',res.data)
+            let arr = Object.assign([],res.data);
+            arr.unshift({
+              id: 0,
+              schoolName:'全部'
+            });
+            this.options = arr;
             reslove(res)
           }
         })
@@ -113,6 +146,12 @@ export default {
 <style scoped lang="scss">
   .topline{
     display: flex;
+  }
+  .topMoudule{
+    margin: 20px 0 40px 40px;
+    *{
+      margin: 0 20px;
+    }
   }
   .block{
     max-width:50%;

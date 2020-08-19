@@ -55,6 +55,24 @@ const global = {
       data: data,
     });
   },
+  //关联的园区列表
+  getNullKindergartenApi(data) {
+    return axios({
+      method: "POST",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/park/selectSchoolList",
+      data: data,
+    });
+  },
+  // 关联园区
+  relationParkApi(data) {
+    return axios({
+      method: "POST",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/park/updategardenfrom",
+      data: data,
+    });
+  },
   //公共查询教师考勤
   getSearhTeaApi(data) {
     return axios({
@@ -91,6 +109,33 @@ const global = {
       params: data
     });
   },
+  //公共查询教师考勤
+  getSelectTeaKqApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectTeaAttend",
+      params: data
+    });
+  },
+  //公共查询学生考勤
+  getSelectStuKqApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectStuAttend",
+      params: data
+    });
+  },
+  //公共查询招生情况
+  getSelectGetStuApi(data) {
+    return axios({
+      method: "GET",
+      contentType: "application/x-www-form-urlencoded",
+      url: "/public/tkq/selectInvitation",
+      params: data
+    });
+  },
   
   //公共新增园区
   insertPark(data){
@@ -118,6 +163,30 @@ const global = {
       contentType: "application/x-www-form-urlencoded",
       url: "/public/updateSchool",
       data: data,
+    });
+  },
+  getJurisdictionBack(params) {
+    // 获取育幼通后台权限列表
+    return axios({
+      method: "get",
+      url: "/park/school/backgroundPermission",
+      params,
+    });
+  },
+  getJurisdictionApp(params) {
+    // 获取APP权限列表
+    return axios({
+      method: "get",
+      url: "/park/school/appPermission",
+      params,
+    });
+  },
+  getKJWBack(params) {
+    // 获取快教务后台权限列表
+    return axios({
+      method: "get",
+      url: "/pc/kjw/school/backgroundPermission",
+      params,
     });
   },
 };

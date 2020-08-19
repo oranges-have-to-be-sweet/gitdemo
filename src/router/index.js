@@ -86,18 +86,20 @@ export const constantRoutes = [
   {
     path: '/parkLocalMam',
     component: Layout,
-    children: [{
-      path: "/parkLocalMam",
-      name: "园区管理",
-      meta: { title: '园区管理', icon: 'el-icon-school'},
-      component: parkLocal,
-      // children:[{
-      //     path: '/parkLocalMam/updata',
-      //     meta: { title: '编辑', icon: 'el-icon-school'},
-      //     component:() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
-      // }] 
-      //() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
-    }]
+    meta: { title: '园区管理', icon: 'el-icon-school'},
+    children:[
+      {
+        path: '/parkLocalMam/',
+        meta: { title: '园区管理', icon: 'el-icon-school'},
+        component:parkLocal
+      },
+      {
+        path: '/parkLocalMam/updata',
+        meta: { title: '编辑', icon: 'el-icon-school'},
+        hidden:true,
+        component:() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
+      }
+    ] 
   },
   {
     path: '/principalMam',

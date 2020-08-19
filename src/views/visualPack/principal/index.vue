@@ -17,7 +17,7 @@
           border
           :data="tableData"
           :height="tableHeight"
-          style="width: 100%;"
+          style="width:100%;"
           :row-style="{ height: columnHeight }"
           :cell-style="{ padding: '0px' }"
           tooltip-effect="light"
@@ -25,16 +25,22 @@
         >
           <el-table-column prop="emplName" align="center" label="姓名">
           </el-table-column>
+          <el-table-column prop="phone" align="center" label="手机号">
+          </el-table-column>
           <el-table-column
             show-overflow-tooltip
             align="center"
-            label="所属园区"
+            label="绑定学校"
           >
           <template slot-scope="scope">
                 <span v-for="(item,index) in scope.row.schools" :key="item.id"> {{scope.row.schools.length?(scope.row.schools.length-1) == index?item.schoolName:item.schoolName +",":'空'}} </span>
             </template>
           </el-table-column>
-          <el-table-column prop="phone" align="center" label="手机号">
+          <el-table-column prop="isDel" align="center" label="是否启用">
+            <template slot-scope="scope">
+              <el-switch v-model="!scope.row.isDel">
+              </el-switch>
+            </template>
           </el-table-column>
           <el-table-column prop="createTime" align="center" label="创建时间">
           </el-table-column>
@@ -96,35 +102,13 @@
       title="关联园区"
       :visible.sync="relationDialog"
       :close-on-click-modal="false"
-      width="500px"
-      :modal="false"
+      width="38%"
       custom-class="add-dialog"
       :lock-scroll="true"
     >
-      <div>
-        <el-form
-          :model="relationForm"
-          :rules="relationFormRules"
-          ref="relationForm"
-          label-width="120px"
-          class="demo-ruleForm"
-        >
-          <el-form-item label="园区名称：" prop="schoolList">
-            <el-select
-              multiple
-              size="mini"
-              v-model="relationForm.schoolList"
-              placeholder="请选择需要关联的园区"
-            >
-              <el-option
-                v-for="item in parkList"
-                :key="item.id"
-                :label="item.schoolName"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
+      <div class="relationDom">
+        <el-cascader :options="parkList" :props="stuProps" v-model="relationForm.idList" :show-all-levels="false"  placeholder="请选择学校(多选)"></el-cascader>
+        <p style="margin-left:12px;color:#777;">当前账号绑定学校后，其他账号不能绑定该学校</p>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="relationDialog = false">取 消</el-button>
@@ -156,9 +140,27 @@ export default {
     };
     return {
       total: 0,
+      stuProps:{
+        multiple: true
+      },
       dialogVisible: false,
       tableLoading: false,
       tableData: [],
+      schoolStyle:1,
+      schoolType:[
+        {
+          label:'育幼通',
+          id:1
+        },
+        {
+          label:'快教务',
+          id:2
+        }
+      ],
+      resSchoolList:[],
+      onlSchoolList:[],
+      newSchoolList:[],
+      parkList:[],
       searchForm: {
         userId: Number(sessionStorage.getItem("userId")),
         pageNum: 1,
@@ -198,12 +200,13 @@ export default {
       // },
       relationForm: {
         userId: Number(sessionStorage.getItem("userId")),
+        compId:"",
+        idList:[],
         schoolList:[],
+        middleSchoolList:[],
         leaderId:"",
         emplId:"",
-        compId:"",
       },
-      parkList: [],
       relationFormRules: {
         schoolList: {
           validator: schoolLista,
@@ -276,48 +279,72 @@ export default {
     },
     
     //获取关联列表
-    openRelation(data) {
-      let datas = data.row;
-      let _this = this;
-     _this.relationDialog = true;
+    openRelation(data) {;
       let load = this.$loading({
           target: document.querySelector(".relationDialog"),
           text: "加载中..."
-      }); 
+      });
+      let datas = data.row;
+      let _this = this;
+      _this.relationDialog = true;
       _this.relationForm.leaderId = datas.userId;
       _this.relationForm.emplId = datas.emplId;
       _this.relationForm.compId = datas.compId;
       let compId = Number(sessionStorage.getItem("companyId"));
-      api.parkManage.getNullKindergartenApi({ compId: compId }).then(res => {
+      api.global.getNullKindergartenApi({ compId: compId }).then(res => {
         if (res.status == 200) {
-          console.log(res.data,'可关联的园区');
-          console.log(data.row.schools,'已关联的园区');
-          let resSchoolList = res.data;
-          let onlSchoolList = data.row.schools;
-          if(data.row.schools.length != 0) {
-            _this.parkList = [...resSchoolList, ...onlSchoolList]
-          } else {
-            _this.parkList = res.data;
-          }
-          _this.relationForm.schoolList = data.row.schools.map(item => item.id)
           _this.$nextTick(() => {
-            _this.$refs.relationForm.clearValidate();
-          })
-          load.close();
+            _this.resSchoolList = res.data;
+            let yyt = datas.schools.map(item=>{
+              return {
+                label:item.name,
+                value:item.id
+              }
+            });
+            let kjw = datas.middle.map(item=>{
+              return {
+                label:item.name,
+                value:item.id
+              }
+            });
+            _this.relationForm.idList = [...yyt,...kjw];
+            let arr = res.data.filter(item=>item.children.length).map(item=>{
+              item.children.map(it =>{
+                it.label = it.name;
+                it.value = it.id;
+                delete it.name;
+                delete it.id;
+                return it;
+              });
+              return item
+            });
+            _this.parkList = arr;
+            console.log(_this.parkList,'可关联的园区树');
+            console.log(_this.relationForm.schoolList,'已关联的园区');
+            load.close();
+          });
         }else{
-
+          load.close();
         }
+      }).catch(err=>{
+          load.close();
       });
     },
     //提交关联
     relationPark() {
       let _this = this;
+      console.log(_this.relationForm.idList);
+      _this.relationForm.schoolList = _this.relationForm.idList.filter(item=>item[0] == 1).map(item=>item[1]);
+      _this.relationForm.middleSchoolList = _this.relationForm.idList.filter(item=>item[0] == 2).map(item=>item[1]);
+      console.log(_this.relationForm.schoolList,'1111111');
+      console.log(_this.relationForm.middleSchoolList,'22222222');
       let options = Object.assign({}, _this.relationForm);
+      delete options.id
       console.log(options);
       let load = _this.$loading({
         target: document.querySelector(".relationDialog")
       });
-      api.parkManage
+      api.global
         .relationParkApi(options)
         .then(res => {
           if (res.status == 200) {
@@ -350,7 +377,6 @@ export default {
       this.up_ruleForm = {
         loginName: data.gardenInfo.emplName,
         mobilePhone: data.gardenInfo.phone,
-        // password:data.gardenInfo.password,
         leaderId: data.gardenInfo.userId
       };
     },
@@ -368,7 +394,7 @@ export default {
       if(window.innerHeight > 1336){
         return window.innerHeight - 200;
       }else{
-        return  window.innerHeight - 180;
+        return  window.innerHeight - 300;
       }
     },
     columnHeight() {
@@ -378,14 +404,13 @@ export default {
       if(window.innerHeight > 1336){
         return window.innerHeight - 140;
       }else{
-        return window.innerHeight - 50;
+        return window.innerHeight - 120;
       }
     }
   },
   mounted() {
     this.refresh();
-    console.log(this.$route.path, '----路由---')
-    // console.log(this.userInfo, "xinxi");
+    console.log(this.$route.path, '----路由---');
   },
   async created() {
     await this.getInfoData();
@@ -396,4 +421,14 @@ export default {
 };
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .group-wrap-main{
+    width: 96%;
+    padding: 20px 2%;
+  }
+  .relationDom{
+    .el-col{
+      margin: 10px;
+    }
+  }
+</style>

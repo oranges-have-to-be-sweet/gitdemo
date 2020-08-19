@@ -12,12 +12,16 @@
       label-width="100px"
       class="demo-ruleForm"
     >
-    <!-- kinder  gartenName -->
       <el-form-item label="园区名称：" prop="schoolName">
         <el-input size="mini" v-model="ruleForm.schoolName" placeholder="请输入园区名称"></el-input>
       </el-form-item>
       <el-form-item label="园区地址：" prop="address">
         <chart v-model="ruleForm.address" :mapData="ruleForm" @getPoint="getPoint" />
+      </el-form-item>
+      <el-form-item label="园区类型：" prop="schoolStyle">
+        <el-select size="mini" class="w180x dib ml mr" v-model="ruleForm.schoolStyle" placeholder="请选择">
+          <el-option v-for="item in schoolType" :key="item.id"  align="center" :label="item.label" :value="item.id"></el-option>
+        </el-select>
       </el-form-item>
       <div class="tree-content">
         <el-form-item label="后台权限：" prop="pcList" class="tree-box">
@@ -33,7 +37,7 @@
           >
           </el-tree>
         </el-form-item>
-        <el-form-item label="App权限：" prop="appList" class="tree-box">
+        <el-form-item v-if="appList.length" label="App权限：" prop="appList" class="tree-box">
           <el-tree
             :style="{ height: treeHeight + 'px' }"
             :data="appList"
@@ -59,6 +63,7 @@
 
 <script>
 import api from "@/api";
+import { mapState } from 'vuex';
 import chart from '@/components/Map/chinaMap1'
 export default {
   data() {
@@ -103,6 +108,16 @@ export default {
       },
       appList: [],
       backList: [],
+      schoolType:[
+        {
+          label:'育幼通',
+          id:1
+        },
+        {
+          label:'快教务',
+          id:2
+        }
+      ],
       ruleForm: {
         userId: Number(sessionStorage.getItem("userId")),
         schoolName: "",
@@ -127,13 +142,13 @@ export default {
   components:{
     chart
   },
-    props: {
-      value: Boolean,
-      mapHeight: {
-        type: Number,
-        default: 500
-      }
-    },
+  props: {
+    value: Boolean,
+    mapHeight: {
+      type: Number,
+      default: 500
+    }
+  },
   methods: {
     initPage() {
       let _this = this;
@@ -143,27 +158,7 @@ export default {
       });
       let userId = Number(sessionStorage.getItem("userId"));
       let compId = Number(sessionStorage.getItem("companyId"));
-      let params = { compId: compId };
-      api.parkManage
-        .getJurisdictionBack(params)
-        .then(res => {
-          console.log('--------获取后台权限----------',res.data);
-          if (res.status == 200) {
-            _this.backList = res.data;
-            _this.findHasParentIds(res.data);
-          }
-        }).then(()=>{
-          api.parkManage
-          .getJurisdictionApp({ compId: compId })
-          .then(res => {
-            console.log('------获取APP权限-----',res.data);
-            if (res.status == 200) {
-              _this.appList = res.data;
-              _this.findHasParentIds(res.data);
-            }
-          })
-        })
-        .then(() => {
+        _this.getYYTTree().then(() => {
           if (_this.$route.query.kindergartenId) {
             _this.checkStrictly = true;
             let id = _this.$route.query.kindergartenId;
@@ -181,7 +176,7 @@ export default {
                     address:res.data.school.address,
                     longitude:res.data.school.longitude,
                     latitude:res.data.school.latitude,
-                    schoolStyle:1,
+                    schoolStyle:this.schoolStyle,
                     id
                   };
                   _this.center = {
@@ -224,12 +219,14 @@ export default {
     },
     insertParkLocal() {
       let _this = this;
-      _this.ruleForm.appList = _this.getAppTree();
       _this.ruleForm.pcList = _this.getPCTree();
-        let load = _this.$loading({
-          target: document.querySelector("#updataParkLocal"),
-          text: "正在分配权限，请稍后..."
-        });
+      if(_this.schoolStyle==2){
+        _this.ruleForm.appList = _this.getAppTree();
+      }
+      let load = _this.$loading({
+        target: document.querySelector("#updataParkLocal"),
+        text: "正在分配权限，请稍后..."
+      });
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
           let options = Object.assign({}, _this.ruleForm);
@@ -297,8 +294,56 @@ export default {
           load.close()
         }
       });
-      // this.getPCTree()
-      // this.getAppTree()
+    },
+    getYYTTree(){
+      let _this = this;
+      return new Promise((reslove,reject)=>{
+        let params = { compId: Number(sessionStorage.getItem("companyId"))};
+        api.global
+        .getJurisdictionBack(params)
+        .then(res => {
+          console.log('--------获取后台权限----------',res.data);
+          if (res.status == 200) {
+            _this.backList = res.data;
+            _this.findHasParentIds(res.data);
+          }
+        }).then(()=>{
+          api.global
+          .getJurisdictionApp({ compId: Number(sessionStorage.getItem("companyId"))})
+          .then(res => {
+            console.log('------获取APP权限-----',res.data);
+            if (res.status == 200) {
+              _this.appList = res.data;
+              _this.findHasParentIds(res.data);
+              reslove(res)
+            }
+          })
+        })
+      })
+    },
+    getKJWTree(){
+      let _this = this;
+      return new Promise((reslove,reject)=>{
+        api.global
+        .getKJWBack({
+          compId: Number(sessionStorage.getItem("companyId"))
+        })
+        .then(res => {
+          console.log("--------获取后台权限----------", res.data);
+          if (res.status == 200) {
+            let options = [
+              {
+                name: "所有权限",
+                id: 9999999999,
+                children: res.data
+              }
+            ];
+            _this.backList = options;
+            _this.findHasParentIds(res.data);
+            reslove(res)
+          }
+        })
+      })
     },
     closeAdd(){
       this.$router.go(-1)
@@ -309,29 +354,51 @@ export default {
       console.log(this.center,this.ruleForm.address);
     }
   },
+  watch:{
+    'ruleForm.schoolStyle':{
+      handler(val){
+        console.log(val);
+        if(val == 1){
+          this.getYYTTree();
+        }else{
+          this.getKJWTree();
+          this.appList = [];
+        }
+      },
+      deep:true
+    }
+  },
   computed: {
     pagePath() {
       return this.$route.path;
     },
     pageHeight(){
       if(window.innerHeight > 1336){
-        return window.innerHeight - 240
+        return window.innerHeight - 120
       }else{
-        return window.innerHeight - 200
+        return window.innerHeight - 80
       }
     },
     treeHeight() {
-      return 500;
+      if(window.innerHeight > 1336){
+        return window.innerHeight - 380
+      }else{
+        return window.innerHeight - 360
+      }
     }
   },
   mounted() {
+    this.schoolStyle = this.$route.query.schoolStyle;
     this.initPage();
-    console.log(this.$route.query)
   }
 };
 </script>
 
 <style scoped lang="scss">
+.group-wrap-main{
+  width: 96%;
+  padding: 20px 2%;
+}
 .tree-content {
   overflow: hidden;
 }

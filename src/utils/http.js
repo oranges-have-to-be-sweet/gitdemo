@@ -32,11 +32,12 @@ service.interceptors.request.use(
 );
 service.interceptors.response.use(
   response => {
-    console.log(response.data,'544444444');
-    if(response.data.status == 200 || response.status == 200){
+    // console.log(response,'544444444');
+    if(response.data.status == 200){
       return response.data;
     }else if(response.data.status == 20011 || response.status == 20011){
-      window.location.href = "/login";
+      sessionStorage.clear();
+      window.location.href = '#/login';
       return Message({
         message: response.data.msg || response.msg || "error",
         type: "error",

@@ -69,7 +69,7 @@ module.exports = {
         }
       },
       "/pc/kjw": {
-        target: "http://192.168.253.53:8084",
+        target: "http://116.62.107.142:8084",
         changOrigin: true,
         pathRewrite: {
           "^/pc/kjw": ""
