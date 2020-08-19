@@ -112,7 +112,7 @@ export default {
   watch:{
     'mapData':{
       handler(val,oldval){
-        console.log(val,oldval);
+        // console.log(val,oldval);
         this.address = val.address
       }
     }

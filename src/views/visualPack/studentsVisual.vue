@@ -17,13 +17,14 @@
           <div v-else class="nullData">暂无数据</div>
         </div>
       </el-col>
-      <el-col :span="11">
+      <el-col :span="11" style="margin-top:50px;">
         <el-table :data="tableData" border style="width:100%">
           <el-table-column prop="className" align="center" label="班级名称"> </el-table-column>
           <el-table-column prop="should" align="center" label="应出勤（次）"> </el-table-column>
           <el-table-column prop="absence" align="center" label="缺勤（次）"> </el-table-column>
           <el-table-column prop="actual" align="center" label="实际出勤（次）"> </el-table-column>
         </el-table>
+        <Pagination v-if="total > 0" :total="total"  @pagination="getToStudent" :page.sync="dataQuery.pageNum" :limit.sync="dataQuery.pageSize"></Pagination>
       </el-col>
     </el-row>
   </div>
@@ -31,21 +32,32 @@
 <script>
 import api from "@/api";
 import chart from '@/components/Charts/pieChart'
+import Pagination from '@/components/pagination';
 import { mapState } from "vuex";
 export default {
   name: "Principal",
   components:{
-    chart
+    chart,
+    Pagination
   },
   data() {
     return {
+      total:0,
       time:"",
       schoolId:"",
       step:0,
       options:[],
       chartData:[],
       tableData:[],
-      schoolStyle:1
+      schoolStyle:1,
+      dataQuery:{
+        compId:Number(sessionStorage.getItem('companyId')),
+        startTime:'',
+        schoolId:'',
+        schoolStyle:1,
+        pageNum:1,
+        pageSize:10
+      },
     };
   },
   computed:{
@@ -57,7 +69,7 @@ export default {
     schoolStyle:{
       handler(val){
         this.options = [];
-        this.schoolId = '';
+        this.schoolId = 0;
         this.getOptions()
       },
       immediate:true
@@ -68,9 +80,11 @@ export default {
     let num  = Number(date.getMonth() + 1) > 10 ? Number(date.getMonth() + 1) : '0'+ Number(date.getMonth() + 1)
     var str = date.getFullYear() + "-" + num;
     this.time = str;
+    this.dataQuery.startTime = this.time + '-01'
     this.step = 1;
     this.getOptions().then((res) => {
       this.schoolId = res.data[0].id
+      this.dataQuery.schoolId = this.schoolId
       this.step = 2 ; 
       this.getToStudent()
     });
@@ -98,20 +112,16 @@ export default {
       })
     },
     getToStudent(){
-      if(this.time == '' && this.schoolId == ''){
+      if(this.time == ''){
         this.$message({
           message:"请选择日期和学校"
         })
         return
       }else{
-        let params = {
-          compId:Number(sessionStorage.getItem('companyId')),
-          schoolId:this.schoolId,
-          startTime:this.time + '-01',
-          schoolStyle:this.schoolStyle,
-          pageNum:1,
-          pageSize:10
-        }
+        let params = {...this.dataQuery};
+        params.startTime = this.time+'-01'
+        params.schoolStyle = this.schoolStyle
+        params.schoolId = this.schoolId
         api.global.getSelectStuKqApi(params).then((res) => {
         if(res.status){
           console.log('-----------学生考勤---------',res.data)
@@ -122,6 +132,7 @@ export default {
           console.log(arr)
           this.chartData=arr;
           this.tableData=res.data.info.list;
+          this.total = res.data.info.total
         }
       })
       }

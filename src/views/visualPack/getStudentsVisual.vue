@@ -17,13 +17,15 @@
           <div v-else class="nullData">暂无数据</div>
         </div>
       </el-col>
-      <el-col :span="11">
+      <el-col :span="11" style="margin-top:50px;">
         <el-table :data="tableData" border style="width: 100%">
+          <el-table-column prop="schoolName" align="center" label="学校名字" > </el-table-column>
           <el-table-column prop="alreadyEntered" align="center" label="已入园（人）" > </el-table-column>
           <el-table-column prop="notEntered" align="center" label="未入园（人）" > </el-table-column>
           <el-table-column prop="rejection" align="center" label="拒收（人）" > </el-table-column>
           <el-table-column prop="badLuck" align="center" label="总计（人）" > </el-table-column>
         </el-table>
+        <Pagination v-if="total > 0" :total="total"  @pagination="getData" :page.sync="dataQuery.pageNum" :limit.sync="dataQuery.pageSize"></Pagination>
       </el-col>
     </el-row>
   </div>
@@ -32,13 +34,16 @@
 import api from "@/api";
 import chart from '@/components/Charts/pieChart' 
 import { mapState } from "vuex";
+import Pagination from '@/components/pagination';
 export default {
   name: "Principal",
   components:{
-    chart
+    chart,
+    Pagination
   },
   data() {
     return {
+      total:0,
       tableData:[],
       time:"" , //日期选择器月份
       schoolName:"",
@@ -46,7 +51,15 @@ export default {
       schoolId:'',
       options:[],
       chartData:[],
-      schoolStyle:1
+      schoolStyle:1,
+      dataQuery:{
+        compId:Number(sessionStorage.getItem('companyId')),
+        startTime:'',
+        schoolId:'',
+        schoolStyle:1,
+        pageNum:1,
+        pageSize:10
+      },
     };
   },
   computed:{
@@ -58,7 +71,7 @@ export default {
     schoolStyle:{
       handler(val){
         this.options = [];
-        this.schoolId = '';
+        this.schoolId = 0;
         this.getOptions()
       },
       immediate:true
@@ -72,24 +85,22 @@ export default {
     let num  = Number(date.getMonth() + 1) > 10 ? Number(date.getMonth() + 1) : '0'+ Number(date.getMonth() + 1)
     var str = date.getFullYear() + "-" + num;
     this.time = str;
+    this.dataQuery.startTime = this.time + '-01'
     this.step = 1 ; 
     this.getOptions().then((res) => {
       this.schoolId = res.data[0].id
+      this.dataQuery.schoolId = this.schoolId
       this.step = 2 ; 
       this.getData()
     });
   },
   methods: {
     getData(){
-      let params = {
-        compId:Number(sessionStorage.getItem('companyId')),
-        schoolId:this.schoolId,
-        startTime:this.time + '-01',
-        schoolStyle:this.schoolStyle,
-        pageNum:1,
-        pageSize:10
-      };
-      if(this.time == '' ||  this.schoolid == ''){
+      let params = {...this.dataQuery};
+      params.startTime = this.time+'-01'
+      params.schoolStyle = this.schoolStyle
+      params.schoolId = this.schoolId
+      if(this.time == ''){
         this.$message({
           message:"请选择日期和学校"
         })
@@ -115,6 +126,7 @@ export default {
           ];
           this.chartData = arr;
           this.tableData = res.data.info.list;
+          this.total = res.data.info.total
         }
       })
     },

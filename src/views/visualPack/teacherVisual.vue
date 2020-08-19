@@ -5,19 +5,19 @@
         <el-select size="mini" class="w180x dib ml mr" v-model="schoolStyle" placeholder="请选择">
           <el-option v-for="item in schoolType" :key="item.id"  align="center" :label="item.label" :value="item.id"></el-option>
         </el-select>
-        <el-select size="mini" class="w180x dib ml mr" v-model="schoolid" placeholder="请选择">
+        <el-select size="mini" class="w180x dib ml mr" v-model="schoolId" placeholder="请选择">
           <el-option v-for="item in options" :key="item.id"  align="center" :label="item.schoolName" :value="item.id"></el-option>
         </el-select>
         <el-button class="dib ml mb" size="mini" @click="getData">查询</el-button>
     </div>
     <el-row>
       <el-col :span="11" :offset="1">
-        <div v-if="chartData.length>0" class="mt map">
-        <chart  v-if="chartData" width="80%" :chartData="chartData" height="600px"></chart>
+        <div class="mt map">
+            <chart  v-if="chartData.length" width="100%" :chartData="chartData" height="600px"></chart>
         <div v-else class="nullData">暂无数据</div>
       </div>
       </el-col>
-      <el-col :span="11">
+      <el-col :span="11" style="margin-top:50px;">
         <el-table :data="tableData" border style="width: 100%" >
           <el-table-column prop="loginName" align="center" label="老师名称" > </el-table-column>
           <el-table-column prop="should" align="center" label="应出勤（天）" > </el-table-column>
@@ -31,6 +31,7 @@
           </el-table-column>
           <el-table-column prop="actual" align="center" label="实际出勤（天）" > </el-table-column>
         </el-table>
+        <Pagination v-if="total > 0" :total="total"  @pagination="getData" :page.sync="dataQuery.pageNum" :limit.sync="dataQuery.pageSize"></Pagination>
       </el-col>
     </el-row>
   </div>
@@ -39,18 +40,30 @@
 import api from "@/api";
 import chart from '@/components/Charts/pieChart' 
 import { mapState } from "vuex";
+import Pagination from '@/components/pagination';
+import { TimeSelect } from 'element-ui';
 export default {
   name: "Principal",
   components:{
-    chart
+    chart,
+    Pagination
   },
   data() {
     return {
+      total:0,
       time:"",
       schoolStyle:1,
-      schoolid: '',
+      schoolId: '',
       chartData:[],
       tableData:[],
+      dataQuery:{
+        compId:Number(sessionStorage.getItem('companyId')),
+        startTime:'',
+        schoolId:'',
+        schoolStyle:1,
+        pageNum:1,
+        pageSize:10
+      },
       options:[],
     };
   },
@@ -66,7 +79,7 @@ export default {
     schoolStyle:{
       handler(val){
         this.options = [];
-        this.schooliod = '';
+        this.schoolId = 0;
         this.getOptions()
       },
       immediate:true
@@ -77,9 +90,11 @@ export default {
       let date = new Date();
       let num  = Number(date.getMonth() + 1) > 10 ? Number(date.getMonth() + 1) : '0'+ Number(date.getMonth() + 1);
       var str = date.getFullYear() + "-" + num;
-      this.time = str;
+      this.time = str  + '-01' ;
+      this.dataQuery.startTime = this.time
       this.getOptions().then((res) => {
-        this.schoolid = res.data[0].id
+        this.schoolId = res.data[0].id
+        this.dataQuery.schoolId = this.schoolId
         this.getData()
       });
     },
@@ -92,7 +107,6 @@ export default {
         }
         api.global.getParkSelectApi(params).then((res) => {
           if(res.status == 200){
-            console.log('-----------学校列表---------',res.data);
             let arr = Object.assign([],res.data);
             arr.unshift({
               id: 0,
@@ -105,29 +119,25 @@ export default {
       })
     },
     getData(){
-      if(this.time == '' ||  this.schoolid == ''){
+      if(this.time == ''){
         this.$message({
           message:"请选择日期和学校"
         })
         return
       }
-      let params = {
-        compId:Number(sessionStorage.getItem('companyId')),
-        startTime:this.time + '-01',
-        schoolId:this.schoolid,
-        schoolStyle:1,
-        pageNum:1,
-        pageSize:10
-      };
+      let params = {...this.dataQuery};
+      params.startTime = this.time+'-01'
+      params.schoolStyle = this.schoolStyle
+      params.schoolId = this.schoolId
       api.global.getSelectTeaKqApi(params).then((res) => {
         if(res.status == 200){
-          console.log(res.data,'教师考勤');
           let arr = [
             {value: res.data.disease || 0, name: '请假率'},
             {value: res.data.attendanceDay || 0 , name: '出勤率'},
           ]
           this.chartData = arr;
           this.tableData = res.data.info.list
+          this.total = res.data.info.total
         }
       })
     },

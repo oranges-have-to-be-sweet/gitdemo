@@ -159,19 +159,19 @@ export default {
       });
       let userId = Number(sessionStorage.getItem("userId"));
       let compId = Number(sessionStorage.getItem("companyId"));
-        _this.getYYTTree().then(() => {
+        // _this.getYYTTree().then(() => {
           if (_this.$route.query.kindergartenId) {
             _this.checkStrictly = true;
             let id = _this.$route.query.kindergartenId;
             api.global
               .getOneParkInfoApi({id})  //获取单个园区信息
               .then(res => {
-                console.log('--------获取单个园区信息-------',res)
+                // console.log('--------获取单个园区信息-------',res)
                 if (res.status == 200) {
                   _this.ruleForm = {
                     userId: Number(sessionStorage.getItem("userId")),
                     compId:Number(sessionStorage.getItem("companyId")),
-                    schoolStyle:this.ruleForm.schoolStyle,
+                    schoolStyle:Number(this.ruleForm.schoolStyle),
                     schoolName:res.data.school.schoolName,
                     pcList: res.data.pc,
                     address:res.data.school.address,
@@ -204,7 +204,7 @@ export default {
           } else {
             load.close();
           }
-        });
+        // });
     },
     findHasParentIds(arr) {
       let ids = [];
@@ -220,7 +220,6 @@ export default {
     },
     getAppTree() {
       let appList = this.$refs.appTree.getCheckedNodes(false, true).map(item => item.id);
-      
       return appList
     },
     insertParkLocal() {
@@ -286,7 +285,6 @@ export default {
                     type: "success"
                   });
                   _this.$router.back();
-                  _this.publish("parkLocal");
                 } else {
                   load.close();
                   _this.$message.error({
@@ -323,8 +321,8 @@ export default {
             if (res.status == 200) {
               _this.appList = res.data;
               _this.findHasParentIds(res.data);
+              reslove(res)
             }
-            reslove(res)
           })
         })
       })
@@ -365,12 +363,12 @@ export default {
   watch:{
     'ruleForm.schoolStyle':{
       handler(val){
-        console.log(val);
+        console.log(val,'watch schoolStyle');
         if(val == 1){
           this.getYYTTree();
         }else{
           this.getKJWTree();
-          this.appList = [];
+          // this.appList = [];
         }
       },
       deep:true
@@ -396,8 +394,9 @@ export default {
     }
   },
   mounted() {
-    this.ruleForm.schoolStyle = this.$route.query.schoolStyle || 1;
     this.disabledType=this.$route.query.kindergartenId?true:false;
+    this.ruleForm.schoolStyle = this.$route.query.schoolStyle || 1;
+    console.log(this.ruleForm.schoolStyle);
     this.initPage();
   }
 };

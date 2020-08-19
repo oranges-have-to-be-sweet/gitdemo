@@ -25,7 +25,7 @@ export default {
     }
 
     if (title) {
-      vnodes.push(<span slot='title'>{(title)}</span>)
+      vnodes.push(<span class="tabTile" slot='title'>{(title)}</span>)
     }
     return vnodes
   }
@@ -37,5 +37,11 @@ export default {
   color: currentColor;
   width: 1em;
   height: 1em;
+}
+.tabTile{
+  display: block;
+  font-size: 15px;
+  margin-top: 10px;
+  text-align: center;
 }
 </style>

@@ -38,7 +38,8 @@
           </el-table-column>
           <el-table-column prop="isDel" align="center" label="是否启用">
             <template slot-scope="scope">
-              <el-switch :active-value="0" :inactive-value="1" v-model="scope.row.isDel"  @change="updateDel(scope)">
+               <!-- v-model="scope.row.isDel" -->
+              <el-switch :active-value="scope.row.isDel==1" :inactive-value="scope.row.isDel==0"  @change="updateDel(scope)">
               </el-switch>
             </template>
           </el-table-column>
@@ -222,23 +223,23 @@ export default {
             _this.tableData = res.data.list;
             let yyt = [];
             let kjw = [];
-            res.data.list.forEach(item=>{
-              console.log(item);
-              item.schools.forEach(yytItem =>{
-                yyt.push({
+            let arr = res.data.list.map(item=>{
+              yyt = item.schools.map(yytItem =>{
+                return {
                   label:yytItem.name,
                   value:yytItem.id
-                }) 
+                } 
               });
-              item.middle.forEach(kjwItem =>{
-                kjw.push({
+              kjw = item.middle.map(kjwItem =>{
+                return {
                   label:kjwItem.name,
                   value:kjwItem.id
-                })
+                }
               });
               item.idList = [...yyt,...kjw];
-              console.log(item.idList)
-            })
+              return item
+            });
+            console.log(arr);
             _this.searchForm.pageNum = res.data.pageNum;
             _this.searchForm.pageSize = res.data.pageSize;
           }

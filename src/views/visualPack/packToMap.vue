@@ -16,11 +16,12 @@ export default {
   },
   data() {
     return {
-      mapData:[]
+      mapData:[],
+      otherData:'',
     };
   },
   mounted() {
-    this.getData();
+    // this.getData();
   },
   methods: {
     getData(){

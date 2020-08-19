@@ -18,6 +18,11 @@
             :value="item.id">
           </el-option>
         </el-select>
+        <div class="bname">
+          <p>快教务共计 <span>{{otherData.kjw}} 所</span> ，</p>
+          <p>育幼通  <span>{{otherData.yyt}} 所</span> ，</p>
+          <p>全部学校共  <span>{{otherData.suoYou}} 所</span> </p>
+        </div>
       </bm-control>
       <bm-map-type
         :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']"
@@ -53,6 +58,7 @@
     },
     data () {
       return {
+        otherData:'',
         zoom: 5,
         index:1,
         show:true,
@@ -108,6 +114,11 @@
         api.global.getAllLngLatListApi(params).then((res) => {
           if( res.status == 200 ){
             console.log('----获取园区信息----',res.data);
+            this.otherData = {
+              kjw:res.data.kjw,
+              suoYou:res.data.suoYou,
+              yyt:res.data.yyt
+            }
             if(res.data.school.length){
               this.markers = res.data.school.map(item => {
                 return {
@@ -125,13 +136,34 @@
   }
 </script>
 
-<style>
+<style >
 .bm-view {
   width: 100%;
   height: calc(100vh - 60px);
 }
 .select{
+  width: 100%;
   margin: 20px;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 120px;
+}
+.bname{
+  display: flex;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  font-size: 13px;
+  overflow: hidden;
+  padding: 0px 10px;
+}
+.bname p{
+  margin: 0px;
+  float: left;
+  height: 40px;
+  line-height: 40px;
+}
+.bname p span{
+  color:rgba(60, 130, 255, 1) ;
 }
 .sample {
   width: 160px;
