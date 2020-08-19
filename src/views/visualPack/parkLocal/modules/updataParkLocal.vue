@@ -19,7 +19,7 @@
         <chart v-model="ruleForm.address" :mapData="ruleForm" @getPoint="getPoint" />
       </el-form-item>
       <el-form-item label="园区类型：" prop="schoolStyle">
-        <el-select size="mini" class="w180x dib ml mr" v-model="ruleForm.schoolStyle" placeholder="请选择">
+        <el-select size="mini" class="w180x dib ml mr" v-model="ruleForm.schoolStyle" placeholder="请选择" :disabled="disabledType">
           <el-option v-for="item in schoolType" :key="item.id"  align="center" :label="item.label" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -68,6 +68,7 @@ import chart from '@/components/Map/chinaMap1'
 export default {
   data() {
     return {
+      disabledType:false,
       center: {
         lng: 116.404,
         lat: 39.915
@@ -395,7 +396,8 @@ export default {
     }
   },
   mounted() {
-    this.ruleForm.schoolStyle = this.$route.query.schoolStyle;
+    this.ruleForm.schoolStyle = this.$route.query.schoolStyle || 1;
+    this.disabledType=this.$route.query.kindergartenId?true:false;
     this.initPage();
   }
 };

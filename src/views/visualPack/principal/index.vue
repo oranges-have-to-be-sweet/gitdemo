@@ -33,12 +33,12 @@
             label="绑定学校"
           >
           <template slot-scope="scope">
-                <span v-for="(item,index) in scope.row.schools" :key="item.id"> {{scope.row.schools.length?(scope.row.schools.length-1) == index?item.schoolName:item.schoolName +",":'空'}} </span>
+                <span v-for="(item,index) in scope.row.idList" :key="item.value"> {{scope.row.idList.length?(scope.row.idList.length-1) == index?item.label:item.label +",":'空'}} </span>
             </template>
           </el-table-column>
           <el-table-column prop="isDel" align="center" label="是否启用">
             <template slot-scope="scope">
-              <el-switch :active-value='scope.row.isDel==1' :inactive-value='scope.row.isDel==0' @change="updateDel(scope)">
+              <el-switch :active-value="0" :inactive-value="1" v-model="scope.row.isDel"  @change="updateDel(scope)">
               </el-switch>
             </template>
           </el-table-column>
@@ -190,14 +190,6 @@ export default {
         phone: { required: true, message: "请输入手机号！", trigger: "blur" },
         password: { required: true, message: "请输入密码！", trigger: "blur" }
       },
-      // up_rules: {
-      //   loginName: {
-      //     required: true,
-      //     message: "请输入真实姓名！",
-      //     trigger: "blur"
-      //   },
-      //   mobilePhone: { required: true, message: "请输入手机号！", trigger: "blur" }
-      // },
       relationForm: {
         userId: Number(sessionStorage.getItem("userId")),
         compId:"",
@@ -228,6 +220,25 @@ export default {
             _this.tableLoading = false;
             _this.total = res.data.total;
             _this.tableData = res.data.list;
+            let yyt = [];
+            let kjw = [];
+            res.data.list.forEach(item=>{
+              console.log(item);
+              item.schools.forEach(yytItem =>{
+                yyt.push({
+                  label:yytItem.name,
+                  value:yytItem.id
+                }) 
+              });
+              item.middle.forEach(kjwItem =>{
+                kjw.push({
+                  label:kjwItem.name,
+                  value:kjwItem.id
+                })
+              });
+              item.idList = [...yyt,...kjw];
+              console.log(item.idList)
+            })
             _this.searchForm.pageNum = res.data.pageNum;
             _this.searchForm.pageSize = res.data.pageSize;
           }
@@ -289,16 +300,16 @@ export default {
               });
               _this.dialogVisible = false;
               _this.refresh();
-            } else  if( res.status == 2004){
-              load.close();
+            } else if( res.status == 2004){
               this.$message({
                 type: "warning",
                 message: "手机号已存在"
               });
-              _this.dialogVisible = false;
-              _this.refresh();
             }
-          })
+          });
+          load.close();
+          _this.dialogVisible = false;
+          _this.refresh();
         }
       });
     },
@@ -419,7 +430,7 @@ export default {
       if(window.innerHeight > 1336){
         return window.innerHeight - 200;
       }else{
-        return  window.innerHeight - 300;
+        return  window.innerHeight - 220;
       }
     },
     columnHeight() {
@@ -429,7 +440,7 @@ export default {
       if(window.innerHeight > 1336){
         return window.innerHeight - 140;
       }else{
-        return window.innerHeight - 120;
+        return window.innerHeight - 100;
       }
     }
   },
