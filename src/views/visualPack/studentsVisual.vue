@@ -10,15 +10,23 @@
       </el-select>
       <el-button class="dib ml mb" size="mini" @click="getToStudent">查询</el-button>
     </div>
-    <el-row>
-      <el-col :span="11" :offset="1">
+    <el-row class="layout-row">
+      <el-col :span="10" :offset="1">
         <div class="mt">
           <chart v-if="chartData.length" width="100%" :chartData="chartData" height="600px"></chart>
           <div v-else class="nullData">暂无数据</div>
         </div>
       </el-col>
-      <el-col :span="11" style="margin-top:50px;">
-        <el-table :data="tableData" border style="width:100%">
+      <el-col :span="10" :offset="1">
+        <el-table
+          :data="tableData" 
+          border
+          :row-style="{ height: columnHeight }"
+          :style="{
+            width: '100%',
+            height:tableHeight+'px',
+            overflow:'auto'
+          }">
           <el-table-column prop="className" align="center" label="班级名称"> </el-table-column>
           <el-table-column prop="should" align="center" label="应出勤（次）"> </el-table-column>
           <el-table-column prop="absence" align="center" label="缺勤（次）"> </el-table-column>
@@ -49,7 +57,7 @@ export default {
       options:[],
       chartData:[],
       tableData:[],
-      schoolStyle:1,
+      schoolStyle:3,
       dataQuery:{
         compId:Number(sessionStorage.getItem('companyId')),
         startTime:'',
@@ -63,7 +71,20 @@ export default {
   computed:{
     ...mapState({
       schoolType: state => state["global"].schoolType, 
-    }) 
+    }),
+    tableHeight() {
+     return 550;
+    },
+    columnHeight() {
+      return (this.tableHeight - 60) / 10 + "px";
+    },
+    pageHeight(){
+      if(window.innerHeight > 1336){
+        return window.innerHeight - 50;
+      }else{
+        return window.innerHeight - 50;
+      }
+    }
   },
   watch:{
     schoolStyle:{
@@ -80,10 +101,10 @@ export default {
     let num  = Number(date.getMonth() + 1) > 10 ? Number(date.getMonth() + 1) : '0'+ Number(date.getMonth() + 1)
     var str = date.getFullYear() + "-" + num;
     this.time = str;
-    this.dataQuery.startTime = this.time + '-01'
+    this.dataQuery.startTime = this.time
     this.step = 1;
     this.getOptions().then((res) => {
-      this.schoolId = res.data[0].id
+      this.schoolId = this.options[0].id
       this.dataQuery.schoolId = this.schoolId
       this.step = 2 ; 
       this.getToStudent()
@@ -119,22 +140,24 @@ export default {
         return
       }else{
         let params = {...this.dataQuery};
-        params.startTime = this.time+'-01'
-        params.schoolStyle = this.schoolStyle
-        params.schoolId = this.schoolId
-        api.global.getSelectStuKqApi(params).then((res) => {
-        if(res.status){
-          console.log('-----------学生考勤---------',res.data)
-          let arr = [
-            {name:'出勤率',value:res.data.attendanceDay || 0},
-            {name:'缺勤率',value:res.data.disease || 0}
-          ]
-          console.log(arr)
-          this.chartData=arr;
-          this.tableData=res.data.info.list;
-          this.total = res.data.info.total
-        }
-      })
+          params.startTime = this.time+'-01'
+          params.schoolStyle = this.schoolStyle
+          params.schoolId = this.schoolId
+          api.global.getSelectStuKqApi(params).then((res) => {
+          if(res.status){
+            console.log('-----------学生考勤---------',res.data)
+            let arr = [
+              {name:'出勤率',value:res.data.attendanceDay || 0},
+              {name:'缺勤率',value:res.data.disease || 0}
+            ]
+            console.log(arr)
+            this.chartData=arr;
+            this.tableData = res.data.info;
+            this.total = res.data.total;
+            this.dataQuery.pageNum = res.data.pageNum;
+            this.dataQuery.pageSize = res.data.pageSize;
+          }
+        })
       }
       
     },
@@ -157,12 +180,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.layout-row{
+  .el-col{
+    height:632px;
+    padding:20px;
+    border-radius:8px;
+    background:rgba(255,255,255,1);
+    box-shadow:0px 0px 30px 0px rgba(0, 0, 0, 0.1);
+    border:2px solid rgba(255,255,255,1);
+  }
+}
 .map{
   height: 600px;
   width: 100%;
 }
 .topMoudule{
-  margin: 20px 0 40px 40px;
+  margin: 20px 0 40px 56px;
   *{
     margin: 0 20px;
   }

@@ -12,6 +12,16 @@ const packToMap = () => import("@/views/visualPack/packToMap.vue");
 const parkLocal = () => import("@/views/visualPack/parkLocal/index");
 const principal = () => import("@/views/visualPack/principal/index");
 
+// const xqfbIcon = require('../assets/siderbarIcon/xqfb.png');
+// const xqfbActiveIcon = require('../assets/siderbarIcon/xqfb_active.png');
+// const jscqIcon = require('../assets/siderbarIcon/jscq.png');
+// const jscqActiveIcon = require('../assets/siderbarIcon/jscq_active.png');
+// const xscqIcon = require('../assets/siderbarIcon/xscq.png');
+// const xscqActiveIcon = require('../assets/siderbarIcon/xscq_active.png');
+// const zsqkIcon = require('../assets/siderbarIcon/zsqk.png');
+// const zsqkActiveIcon = require('../assets/siderbarIcon/zsqk_active.png');
+// const zhglIcon = require('../assets/siderbarIcon/zhgl.png');
+// const zhglActiveIcon = require('../assets/siderbarIcon/zhgl_active.png');
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -49,8 +59,8 @@ export const constantRoutes = [
     children: [{
       path: '/packToMap',
       component: packToMap,
-      name: '园区分布',
-      meta: { title: '园区分布', icon: 'el-icon-s-flag' }
+      name: '校区分布',
+      meta: { title: '校区分布', icon: 'el-icon-s-flag' }
     }]
   },
   {
@@ -84,19 +94,18 @@ export const constantRoutes = [
     }]
   },
   {
-    path: '/parkLocalMam',
+    path: '',
     component: Layout,
-    meta: { title: '园区管理', icon: 'el-icon-school'},
     children:[
       {
-        path: '/parkLocalMam/',
-        meta: { title: '园区管理', icon: 'el-icon-school'},
+        path: '/parkLocalMam',
+        meta: { title: '校区管理', icon: 'el-icon-school'},
         component:parkLocal
       },
       {
         path: '/parkLocalMam/updata',
-        meta: { title: '编辑', icon: 'el-icon-school'},
         hidden:true,
+        meta: { title: '编辑', icon: 'el-icon-school'},
         component:() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
       }
     ] 
@@ -107,8 +116,8 @@ export const constantRoutes = [
     children: [{
       path: '/principalMam',
       component: principal,
-      name: '园长管理',
-      meta: { title: '园长管理', icon: 'el-icon-s-custom' }
+      name: '账号管理',
+      meta: { title: '账号管理', icon: 'el-icon-s-custom' }
     }]
   },
   {

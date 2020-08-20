@@ -19,7 +19,7 @@
               type="primary"
               size="mini"
               @click="updata(0)"
-              >新增园区</el-button
+              >新增学校</el-button
             >
           </el-form-item>
         </el-form>
@@ -38,10 +38,10 @@
           <el-table-column
             prop="schoolName"
             align="center"
-            label="园区名称"
+            label="学校名称"
           >
           </el-table-column>
-          <!-- <el-table-column prop="schoolNo" align="center" label="园区编码">
+          <!-- <el-table-column prop="schoolNo" align="center" label="学校编码">
           </el-table-column> -->
           <el-table-column prop="schoolStyle" align="center" label="学校类型">
             <template slot-scope="scope">
@@ -54,7 +54,7 @@
             prop="address"
             align="center"
             :show-overflow-tooltip="true"
-            label="园区地址"
+            label="学校地址"
           >
           </el-table-column>
           <el-table-column align="center" label="操作">
@@ -64,7 +64,7 @@
               </el-button>
               <el-button size="mini" type="text" @click="goLogin(scope)">
                 <a :href="hrefUrl" target='_blank'>
-                  跳转并登录
+                  跳转去登陆
                 </a>
               </el-button>
             </template>
@@ -138,10 +138,10 @@ export default {
       }
     },
     goLogin(val){
-      let token = sessionStorage.getItem('token');
-      let userId = sessionStorage.getItem('userId');
-      let yyt_devHref = process.env.VUE_APP_HREF_YYT + `?banXueToken=${token}&userId=${userId}`;
-      let kjw_Href = process.env.VUE_APP_HREF_KJW + `?banXueToken=${token}&userId=${userId}`;
+      // let token = sessionStorage.getItem('token');
+      // let userId = sessionStorage.getItem('userId');
+      let yyt_devHref = process.env.VUE_APP_HREF_YYT //+ `?banXueToken=${token}&userId=${userId}`;
+      let kjw_Href = process.env.VUE_APP_HREF_KJW //+ `?banXueToken=${token}&userId=${userId}`;
       this.hrefUrl = val.row.schoolStyle==1?yyt_devHref:kjw_Href;
       
     },

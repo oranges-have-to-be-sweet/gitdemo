@@ -6,6 +6,9 @@
         <div class="logintext">——  育见美好 智育未来  ——</div>
       </div>
         <div class="form-content">
+          <div class="login_title">
+            <p style="color:#fff">智慧校园综合管理平台</p>
+          </div>
           <el-form
             :model="loginData"
             :rules="rules"
@@ -212,6 +215,18 @@ export default {
   left: 60%;
   transform: translate(-50%, -50%);
   // position: relative;
+}
+.login_title{
+  width:100%;
+  height:40px;
+  font-size:36px;
+  font-weight:bold;
+  text-align:center;
+  // margin-left:50px;
+  transform:translateX(50px) translateY(-80px);
+  p{
+    line-height:40px;
+  }
 }
 .login-footer {
   display: flex;

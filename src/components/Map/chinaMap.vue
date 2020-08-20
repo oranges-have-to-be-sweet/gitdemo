@@ -31,10 +31,10 @@
       <!--地图缩放-->
       <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
       <!--标注点  animation="BMAP_ANIMATION_BOUNCE"-->
-      <div v-for="marker in markers" :key="marker.lng">
+      <div v-for="(marker,index) in markers" :key="index">
         <bm-marker
           :position="{lng: marker.lng, lat: marker.lat}"
-          :icon="{url: 'http://api0.map.bdimg.com//images/hd_red_marker.png', size: {width: 40, height: 50}}"
+          :icon="{url: pointIcon, size: {width: 40, height: 42}}"
         ></bm-marker>
         <bm-label
           :content="marker.content"
@@ -59,6 +59,7 @@
     data () {
       return {
         otherData:'',
+        pointIcon:require('../../assets/point.png'),
         zoom: 5,
         index:1,
         show:true,
@@ -150,11 +151,11 @@
 }
 .bname{
   display: flex;
-  background-color: #f8f8f8;
+  background-color: #fff;
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 16px;
   overflow: hidden;
-  padding: 0px 10px;
+  padding: 5px 15px;
 }
 .bname p{
   margin: 0px;

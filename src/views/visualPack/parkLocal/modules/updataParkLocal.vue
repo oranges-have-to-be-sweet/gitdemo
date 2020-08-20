@@ -12,14 +12,14 @@
       label-width="100px"
       class="demo-ruleForm"
     >
-      <el-form-item label="园区名称：" prop="schoolName">
-        <el-input size="mini" v-model="ruleForm.schoolName" placeholder="请输入园区名称"></el-input>
+      <el-form-item label="学校名称：" prop="schoolName">
+        <el-input size="mini" v-model="ruleForm.schoolName" placeholder="请输入学校名称"></el-input>
       </el-form-item>
-      <el-form-item label="园区地址：" prop="address">
-        <chart v-model="ruleForm.address" :mapData="ruleForm" @getPoint="getPoint" />
+      <el-form-item label="学校地址：" prop="address">
+        <chart v-model="ruleForm.address" :mapData="mapData" @getPoint="getPoint" />
       </el-form-item>
-      <el-form-item label="园区类型：" prop="schoolStyle">
-        <el-select size="mini" class="w180x dib ml mr" v-model="ruleForm.schoolStyle" placeholder="请选择" :disabled="disabledType">
+      <el-form-item label="学校类型：" prop="schoolStyle">
+        <el-select size="mini" class="w180x dib ml mr" v-model="ruleForm.schoolStyle" @change="getTree" :disabled="disabledType">
           <el-option v-for="item in schoolType" :key="item.id"  align="center" :label="item.label" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
@@ -39,7 +39,7 @@
         </el-form-item>
         <el-form-item v-if="ruleForm.schoolStyle==1" label="App权限：" prop="appList" class="tree-box">
           <el-tree
-            :style="{ height: treeHeight + 'px' }"
+            :style="{ height: treeHeight + 'px',overflowY: 'auto'}"
             :data="appList"
             :default-expand-all="true"
             :check-strictly="checkStrictly"
@@ -77,17 +77,17 @@ export default {
       rules: {
         kindergartenName: {
           required: true,
-          message: "请输入园区名称！",
+          message: "请输入学校名称！",
           trigger: "blur"
         },
         schoolName: {
           required: true,
-          message: "请输入园区名称！",
+          message: "请输入学校名称！",
           trigger: "blur"
         },
         address: {
           required: true,
-          message: "请输入园区地址！",
+          message: "请输入学校地址！",
           trigger: "change"
         },
         // appList: [
@@ -98,14 +98,14 @@ export default {
         //     trigger: "blur"
         //   }
         // ],
-        pcList: [
-          {
-            type: "array",
-            required: true,
-            message: "请至少分配后台一个权限！",
-            trigger: "blur"
-          }
-        ]
+        // pcList: [
+        //   {
+        //     type: "array",
+        //     required: true,
+        //     message: "请至少分配后台一个权限！",
+        //     trigger: "blur"
+        //   }
+        // ]
       },
       appList: [],
       backList: [],
@@ -122,7 +122,7 @@ export default {
       ruleForm: {
         userId: Number(sessionStorage.getItem("userId")),
         schoolName: "",
-        schoolStyle:1,
+        schoolStyle:3,
         appList: [],
         pcList: [],
         address: "",
@@ -130,6 +130,11 @@ export default {
         latitude:'',
         longitude:'',
         compId:Number(sessionStorage.getItem("companyId"))
+      },
+      mapData: {
+        address: "",
+        latitude:'',
+        longitude:''
       },
       defaultProps: {
         children: "children",
@@ -159,52 +164,60 @@ export default {
       });
       let userId = Number(sessionStorage.getItem("userId"));
       let compId = Number(sessionStorage.getItem("companyId"));
-        // _this.getYYTTree().then(() => {
-          if (_this.$route.query.kindergartenId) {
-            _this.checkStrictly = true;
-            let id = _this.$route.query.kindergartenId;
-            api.global
-              .getOneParkInfoApi({id})  //获取单个园区信息
-              .then(res => {
-                // console.log('--------获取单个园区信息-------',res)
-                if (res.status == 200) {
-                  _this.ruleForm = {
-                    userId: Number(sessionStorage.getItem("userId")),
-                    compId:Number(sessionStorage.getItem("companyId")),
-                    schoolStyle:Number(this.ruleForm.schoolStyle),
-                    schoolName:res.data.school.schoolName,
-                    pcList: res.data.pc,
-                    address:res.data.school.address,
-                    longitude:res.data.school.longitude,
-                    latitude:res.data.school.latitude,
-                    id
-                  };
-                  if(_this.ruleForm.schoolStyle==1){
-                    _this.ruleForm.appList=res.data.app;
-                  };
-                  _this.center = {
-                    lat:res.data.school.latitude,
-                    lng:res.data.school.longitude
-                  };
-                  if(_this.ruleForm.schoolStyle==1){
-                    _this.$refs.appTree.setCheckedKeys(
-                      res.data.app
-                    );
-                  }
-                  _this.$refs.pcTree.setCheckedKeys(
-                    res.data.pc
-                  );
-                  load.close();
-                  console.log(res.data , '-------回显数据--------')
-                }
-              })
-              .then(() => {
-                _this.checkStrictly = false;
-              });
-          } else {
-            load.close();
-          }
-        // });
+      if(this.ruleForm.schoolStyle==1){
+        _this.getYYTTree()
+      }else{
+        _this.getKJWTree()
+      };
+      if (_this.$route.query.kindergartenId) {
+        _this.checkStrictly = true;
+        let id = _this.$route.query.kindergartenId;
+        api.global
+          .getOneParkInfoApi({id})  //获取单个学校信息
+          .then(res => {
+            // console.log('--------获取单个学校信息-------',res)
+            if (res.status == 200) {
+              _this.ruleForm = {
+                userId: Number(sessionStorage.getItem("userId")),
+                compId:Number(sessionStorage.getItem("companyId")),
+                schoolStyle:Number(this.ruleForm.schoolStyle),
+                schoolName:res.data.school.schoolName,
+                pcList: res.data.pc,
+                address:res.data.school.address,
+                longitude:res.data.school.longitude,
+                latitude:res.data.school.latitude,
+                id
+              };
+              _this.mapData = {  //给chart赋值
+                address:res.data.school.address,
+                longitude:res.data.school.longitude,
+                latitude:res.data.school.latitude
+              }
+              if(_this.ruleForm.schoolStyle==1){
+                _this.ruleForm.appList = res.data.app;
+              };
+              _this.center = {
+                lat:res.data.school.latitude,
+                lng:res.data.school.longitude
+              };
+              if(_this.ruleForm.schoolStyle==1){
+                _this.$refs.appTree.setCheckedKeys(
+                  res.data.app
+                );
+              }
+              _this.$refs.pcTree.setCheckedKeys(
+                res.data.pc
+              );
+              load.close();
+              console.log(res.data , '-------回显数据--------')
+            }
+          })
+          .then(() => {
+            _this.checkStrictly = false;
+          });
+      } else {
+        load.close();
+      }
     },
     findHasParentIds(arr) {
       let ids = [];
@@ -224,16 +237,18 @@ export default {
     },
     insertParkLocal() {
       let _this = this;
-      _this.ruleForm.pcList = _this.getPCTree();
-      if(_this.ruleForm.schoolStyle==1){
-        _this.ruleForm.appList = _this.getAppTree();
-      }
-      let load = _this.$loading({
-        target: document.querySelector("#updataParkLocal"),
-        text: "正在分配权限，请稍后..."
-      });
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
+          let load = _this.$loading({
+            target: document.querySelector("#updataParkLocal"),
+            text: "正在分配权限，请稍后..."
+          });
+          _this.ruleForm.pcList = _this.getPCTree();
+          if(_this.ruleForm.pcList.length==0) return _this.$message({type:'warning',message:'请至少给后台分配一个权限'});
+          if(_this.ruleForm.schoolStyle==1){
+            _this.ruleForm.appList = _this.getAppTree();
+            if(_this.ruleForm.appList.length==0) return _this.$message({type:'warning',message:'请至少给app分配一个权限'});
+          }
           let options = Object.assign({}, _this.ruleForm);
           options.longitude=_this.center.lng;
           options.latitude=_this.center.lat;
@@ -253,7 +268,7 @@ export default {
                 if (res.status == 200) {
                   load.close();
                   _this.$message({
-                    message: "园区编辑成功！",
+                    message: "学校编辑成功！",
                     type: "success"
                   });
                   _this.$router.back();
@@ -281,7 +296,7 @@ export default {
                 if (res.status == 200) {
                   load.close();
                   _this.$message({
-                    message: "园区创建成功！",
+                    message: "学校创建成功！",
                     type: "success"
                   });
                   _this.$router.back();
@@ -296,40 +311,26 @@ export default {
                 load.close();
               });
           }
-        } else {
-          load.close()
         }
       });
     },
     getYYTTree(){
       let _this = this;
-      return new Promise((reslove,reject)=>{
+      // return new Promise((reslove,reject)=>{
         let params = { compId: Number(sessionStorage.getItem("companyId"))};
-        api.global
-        .getJurisdictionBack(params)
-        .then(res => {
-          console.log('--------获取后台权限----------',res.data);
-          if (res.status == 200) {
-            _this.backList = res.data;
-            _this.findHasParentIds(res.data);
-          }
-        }).then(()=>{
-          api.global
-          .getJurisdictionApp({ compId: Number(sessionStorage.getItem("companyId"))})
-          .then(res => {
-            console.log('------获取APP权限-----',res.data);
-            if (res.status == 200) {
-              _this.appList = res.data;
-              _this.findHasParentIds(res.data);
-              reslove(res)
-            }
-          })
-        })
-      })
+        let backApi = api.global.getJurisdictionBack(params);
+        let appApi = api.global.getJurisdictionApp(params);
+        Promise.all([backApi,appApi]).then(values=>{
+          console.log(values)
+          _this.backList = values[0].data;
+          _this.appList = values[1].data;
+          
+        }).catch(err=>{
+          this.$message({type:'error',message:'获取权限错误'})
+        });
     },
     getKJWTree(){
       let _this = this;
-      return new Promise((reslove,reject)=>{
         api.global
         .getKJWBack({
           compId: Number(sessionStorage.getItem("companyId"))
@@ -346,10 +347,11 @@ export default {
             ];
             _this.backList = options;
             _this.findHasParentIds(res.data);
-            reslove(res)
           }
+        }).catch(err=>{
+          reject(_this.$message({type:'error',message:'获取权限错误（kjw）'}));
         })
-      })
+      // })
     },
     closeAdd(){
       this.$router.go(-1)
@@ -358,20 +360,19 @@ export default {
       this.ruleForm.address = val.addr;
       this.center = val.center;
       console.log(this.center,this.ruleForm.address);
+    },
+    getTree(){
+      if(this.ruleForm.schoolStyle == 1){
+        this.getYYTTree();
+      }else{
+        this.getKJWTree();
+      }
     }
   },
   watch:{
-    'ruleForm.schoolStyle':{
-      handler(val){
-        console.log(val,'watch schoolStyle');
-        if(val == 1){
-          this.getYYTTree();
-        }else{
-          this.getKJWTree();
-          // this.appList = [];
-        }
-      },
-      deep:true
+    mapData(val){
+      console.log(val)
+      this.mapData = val;
     }
   },
   computed: {
@@ -416,6 +417,9 @@ export default {
   v::deep .el-tree {
     overflow-y: auto !important;
   }
+}
+.tree-box:not(:last-child){
+  margin-left: 20px;
 }
 .btn-box {
   width: 100%;

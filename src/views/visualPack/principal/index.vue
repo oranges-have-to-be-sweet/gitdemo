@@ -9,7 +9,7 @@
               type="primary"
               size="mini"
               @click="openDialog"
-              >新增园长</el-button>
+              >新增账号</el-button>
           </el-form-item>
         </el-form>
       <div class="table-content">
@@ -50,7 +50,7 @@
               <el-button
                 size="mini"
                 type="text"
-                @click="openRelation(scope)">关联园区</el-button>
+                @click="openRelation(scope)">关联学校</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -83,11 +83,11 @@
           label-width="120px"
           class="demo-ruleForm"
         >
-          <el-form-item label="园长姓名：" prop="loginName">
+          <el-form-item label="姓名：" prop="loginName">
             <el-input size="mini" v-model="ruleForm.loginName"></el-input>
           </el-form-item>
-          <el-form-item label="园长手机号：" prop="phone">
-            <el-input size="mini" v-model="ruleForm.phone"></el-input>
+          <el-form-item label="手机号：" prop="phone">
+            <el-input size="mini" v-model="ruleForm.phone" maxlength="11" show-word-limit></el-input>
           </el-form-item>
           <el-form-item label="登录密码" prop="password">
             <el-input size="mini" v-model="ruleForm.password" show-password></el-input>
@@ -100,11 +100,11 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="关联园区"
+      title="关联学校"
       :visible.sync="relationDialog"
       :close-on-click-modal="false"
       width="38%"
-      custom-class="add-dialog"
+      custom-class="relationDialog"
       :lock-scroll="true"
     >
       <div class="relationDom">
@@ -158,7 +158,6 @@ export default {
           id:2
         }
       ],
-      resSchoolList:[],
       onlSchoolList:[],
       newSchoolList:[],
       parkList:[],
@@ -316,48 +315,52 @@ export default {
     },
     
     //获取关联列表
-    openRelation(data) {;
+    openRelation(data) {
+      let _this = this;
+      let datas = data.row;
+      _this.relationDialog = true;
       let load = this.$loading({
           target: document.querySelector(".relationDialog"),
           text: "加载中..."
       });
-      let datas = data.row;
-      let _this = this;
-      _this.relationDialog = true;
       _this.relationForm.leaderId = datas.userId;
       _this.relationForm.emplId = datas.emplId;
       _this.relationForm.compId = datas.compId;
       let compId = Number(sessionStorage.getItem("companyId"));
-      api.global.getNullKindergartenApi({ compId: compId }).then(res => {
+      api.global.getNullKindergartenApi({ compId: compId,leaderId:datas.userId }).then(res => {
         if (res.status == 200) {
           _this.$nextTick(() => {
-            _this.resSchoolList = res.data;
             let yyt = datas.schools.map(item=>{
               return {
                 label:item.name,
-                value:item.id
+                value:item.id,
+                pId:1
               }
             });
             let kjw = datas.middle.map(item=>{
               return {
                 label:item.name,
-                value:item.id
+                value:item.id,
+                pId:2
               }
             });
-            _this.relationForm.idList = [...yyt,...kjw];
-            let arr = res.data.filter(item=>item.children.length).map(item=>{
-              item.children.map(it =>{
-                it.label = it.name;
-                it.value = it.id;
-                delete it.name;
-                delete it.id;
-                return it;
+            console.log(yyt,'育幼通',kjw,'快教务');
+            _this.relationForm.idList = [...yyt,...kjw].map(item=>{
+              return [item.pId,item.value]
+            });
+            let arr = res.data.map(item=>{
+              item.children = item.children.map(it =>{
+                return {
+                  label:it.name,
+                  value:it.id
+                }
               });
+              console.log(item,'22222');
               return item
             });
             _this.parkList = arr;
             console.log(_this.parkList,'可关联的园区树');
-            console.log(_this.relationForm.schoolList,'已关联的园区');
+            console.log(_this.relationForm.idList,'已关联的园区');
             load.close();
           });
         }else{
@@ -371,6 +374,7 @@ export default {
     relationPark() {
       let _this = this;
       console.log(_this.relationForm.idList);
+      // return false;
       _this.relationForm.schoolList = _this.relationForm.idList.filter(item=>item[0] == 1).map(item=>item[1]);
       _this.relationForm.middleSchoolList = _this.relationForm.idList.filter(item=>item[0] == 2).map(item=>item[1]);
       console.log(_this.relationForm.schoolList,'1111111');
@@ -417,11 +421,6 @@ export default {
         leaderId: data.gardenInfo.userId
       };
     },
-    pageChange(item) {
-      this.searchForm.pageNum = item.pageIndex;
-      this.searchForm.pageSize = item.pageSize;
-      this.refresh();
-    },
     getInfoData() {
       let id = sessionStorage.getItem("userId");
     }
@@ -429,19 +428,19 @@ export default {
   computed: {
     tableHeight() {
       if(window.innerHeight > 1336){
-        return window.innerHeight - 200;
+        return window.innerHeight - 290;
       }else{
-        return  window.innerHeight - 220;
+        return  window.innerHeight - 250;
       }
     },
     columnHeight() {
-      return (this.tableHeight - 80) / 10 + "px";
+      return (this.tableHeight - 60) / 10 + "px";
     },
     pageHeight(){
       if(window.innerHeight > 1336){
-        return window.innerHeight - 140;
+        return window.innerHeight - 120;
       }else{
-        return window.innerHeight - 100;
+        return window.innerHeight - 80;
       }
     }
   },
