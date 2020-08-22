@@ -1,13 +1,14 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 const teacherVisual = () => import("@/views/visualPack/teacherVisual.vue");
 const studentsVisual = () => import("@/views/visualPack/studentsVisual.vue");
-const getStudentsVisual = () => import("@/views/visualPack/getStudentsVisual.vue");
+const getStudentsVisual = () =>
+  import("@/views/visualPack/getStudentsVisual.vue");
 const packToMap = () => import("@/views/visualPack/packToMap.vue");
 const parkLocal = () => import("@/views/visualPack/parkLocal/index");
 const principal = () => import("@/views/visualPack/principal/index");
@@ -48,82 +49,93 @@ const principal = () => import("@/views/visualPack/principal/index");
  */
 export const constantRoutes = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index1'),
-    hidden: true
+    path: "/login",
+    component: () => import("@/views/login/index"),
+    hidden: true,
   },
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect:'/packToMap',
-    children: [{
-      path: '/packToMap',
-      component: packToMap,
-      name: '校区分布',
-      meta: { title: '校区分布', icon: 'el-icon-s-flag' }
-    }]
-  },
-  {
-    path: '/packTeacher',
-    component: Layout,
-    children: [{
-      path: '/packTeacher',
-      component: teacherVisual,
-      name: '教师出勤',
-      meta: { title: '教师出勤', icon: 'el-icon-data-line' }
-    }]
-  },
-  {
-    path: '/packStudent',
-    component: Layout,
-    children: [{
-      path: '/packStudent',
-      component: studentsVisual,
-      name: '学生出勤',
-      meta: { title: '学生出勤', icon: 'el-icon-pie-chart' }
-    }]
-  },
-  {
-    path: '/packGetStudents',
-    component: Layout,
-    children: [{
-      path: '/packGetStudents',
-      component: getStudentsVisual,
-      name: '招生情况',
-      meta: { title: '招生情况', icon: 'el-icon-s-data' }
-    }]
-  },
-  {
-    path: '',
-    component: Layout,
-    children:[
+    redirect: "/packToMap",
+    children: [
       {
-        path: '/parkLocalMam',
-        meta: { title: '校区管理', icon: 'el-icon-school'},
-        component:parkLocal
+        path: "/packToMap",
+        component: packToMap,
+        name: "校区分布",
+        meta: { title: "校区分布", icon: "el-icon-s-flag" },
+      },
+    ],
+  },
+  {
+    path: "/packTeacher",
+    component: Layout,
+    children: [
+      {
+        path: "/packTeacher",
+        component: teacherVisual,
+        name: "教师出勤",
+        meta: { title: "教师出勤", icon: "el-icon-data-line" },
+      },
+    ],
+  },
+  {
+    path: "/packStudent",
+    component: Layout,
+    children: [
+      {
+        path: "/packStudent",
+        component: studentsVisual,
+        name: "学生出勤",
+        meta: { title: "学生出勤", icon: "el-icon-pie-chart" },
+      },
+    ],
+  },
+  {
+    path: "/packGetStudents",
+    component: Layout,
+    children: [
+      {
+        path: "/packGetStudents",
+        component: getStudentsVisual,
+        name: "招生情况",
+        meta: { title: "招生情况", icon: "el-icon-s-data" },
+      },
+    ],
+  },
+  {
+    path: "",
+    component: Layout,
+    children: [
+      {
+        path: "/parkLocalMam",
+        meta: { title: "校区管理", icon: "el-icon-school" },
+        component: parkLocal,
       },
       {
-        path: '/parkLocalMam/updata',
-        hidden:true,
-        meta: { title: '编辑', icon: 'el-icon-school'},
-        component:() => import("@/views/visualPack/parkLocal/modules/updataParkLocal")
-      }
-    ] 
+        path: "/parkLocalMam/updata",
+        hidden: true,
+        meta: { title: "编辑", icon: "el-icon-school" },
+        component: () =>
+          import("@/views/visualPack/parkLocal/modules/updataParkLocal"),
+      },
+    ],
   },
   {
-    path: '/principalMam',
+    path: "/principalMam",
     component: Layout,
-    children: [{
-      path: '/principalMam',
-      component: principal,
-      name: '账号管理',
-      meta: { title: '账号管理', icon: 'el-icon-s-custom' }
-    }]
+    children: [
+      {
+        path: "/principalMam",
+        component: principal,
+        name: "账号管理",
+        meta: { title: "账号管理", icon: "el-icon-s-custom" },
+      },
+    ],
   },
   {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
+    path: "/404",
+    component: () => import("@/views/404"),
+    hidden: true,
   },
   // {
   //   path: '/',
@@ -253,21 +265,22 @@ export const constantRoutes = [
   //   ]
   // },
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
+  { path: "*", redirect: "/404", hidden: true },
+];
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+const createRouter = () =>
+  new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes,
+  });
 
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
 
-export default router
+export default router;

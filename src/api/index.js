@@ -3,10 +3,9 @@ import login from "./login";
 import visualPack from "./visualPack";
 import parkManage from "./parkManage";
 
-
 export default {
-  parkManage,
+  // parkManage,
   global,
-  login,
-  visualPack
+  login
+  // visualPack
 };

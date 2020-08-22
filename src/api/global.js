@@ -43,7 +43,7 @@ const global = {
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/park/getGardenLeaderData",
-      data: data,
+      data: data
     });
   },
   //新增园长
@@ -52,7 +52,7 @@ const global = {
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/park/addGardenLeader",
-      data: data,
+      data: data
     });
   },
   //关联的园区列表
@@ -61,7 +61,7 @@ const global = {
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/park/selectSchoolList",
-      data: data,
+      data: data
     });
   },
   // 关联园区
@@ -70,7 +70,7 @@ const global = {
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/park/updategardenfrom",
-      data: data,
+      data: data
     });
   },
   //公共查询教师考勤
@@ -136,23 +136,23 @@ const global = {
       params: data
     });
   },
-  
+
   //公共新增园区
-  insertPark(data){
+  insertPark(data) {
     return axios({
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/public/insertSchool",
-      data: data,
+      data: data
     });
   },
   //查询单个园区信息
-  getOneParkInfo(data){
+  getOneParkInfo(data) {
     return axios({
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/public/selectSchool",
-      data: data,
+      data: data
     });
   },
 
@@ -162,7 +162,7 @@ const global = {
       method: "POST",
       contentType: "application/x-www-form-urlencoded",
       url: "/public/updateSchool",
-      data: data,
+      data: data
     });
   },
   getJurisdictionBack(params) {
@@ -170,7 +170,7 @@ const global = {
     return axios({
       method: "get",
       url: "/park/school/backgroundPermission",
-      params,
+      params
     });
   },
   getJurisdictionApp(params) {
@@ -178,7 +178,7 @@ const global = {
     return axios({
       method: "get",
       url: "/park/school/appPermission",
-      params,
+      params
     });
   },
   getKJWBack(params) {
@@ -186,10 +186,10 @@ const global = {
     return axios({
       method: "get",
       url: "/pc/kjw/school/backgroundPermission",
-      params,
+      params
     });
   },
-  updataDel(params){
+  updataDel(params) {
     // 获取快教务后台权限列表
     return axios({
       method: "get",
