@@ -144,7 +144,7 @@ export default {
                     "companyId",
                     res.data.companyList[0].id
                   );
-                  _this.$router.push("/");
+                  _this.$router.push("/packToMap");
                   _this.$message({
                     message: "登录成功",
                     type: "success"

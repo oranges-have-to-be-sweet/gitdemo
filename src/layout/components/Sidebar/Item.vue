@@ -1,35 +1,39 @@
 <script>
 export default {
-  name: 'MenuItem',
+  name: "MenuItem",
   functional: true,
   props: {
     icon: {
       type: String,
-      default: ''
+      default: ""
     },
     title: {
       type: String,
-      default: ''
+      default: ""
     }
   },
   render(h, context) {
-    const { icon, title } = context.props
-    const vnodes = []
+    const { icon, title } = context.props;
+    const vnodes = [];
 
     if (icon) {
-      if (icon.includes('el-icon')) {
-        vnodes.push(<i class={[icon, 'sub-el-icon']} />)
+      if (icon.includes("el-icon")) {
+        vnodes.push(<i class={[icon, "sub-el-icon"]} />);
       } else {
-        vnodes.push(<svg-icon icon-class={icon}/>)
+        vnodes.push(<svg-icon icon-class={icon} />);
       }
     }
 
     if (title) {
-      vnodes.push(<span class="tabTile" slot='title'>{(title)}</span>)
+      vnodes.push(
+        <span class="tabTile" slot="title">
+          {title}
+        </span>
+      );
     }
-    return vnodes
+    return vnodes;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -38,7 +42,7 @@ export default {
   width: 1em;
   height: 1em;
 }
-.tabTile{
+.tabTile {
   display: block;
   font-size: 15px;
   margin-top: 10px;

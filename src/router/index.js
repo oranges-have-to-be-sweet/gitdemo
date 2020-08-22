@@ -13,16 +13,18 @@ const packToMap = () => import("@/views/visualPack/packToMap.vue");
 const parkLocal = () => import("@/views/visualPack/parkLocal/index");
 const principal = () => import("@/views/visualPack/principal/index");
 
-// const xqfbIcon = require('../assets/siderbarIcon/xqfb.png');
-// const xqfbActiveIcon = require('../assets/siderbarIcon/xqfb_active.png');
-// const jscqIcon = require('../assets/siderbarIcon/jscq.png');
-// const jscqActiveIcon = require('../assets/siderbarIcon/jscq_active.png');
-// const xscqIcon = require('../assets/siderbarIcon/xscq.png');
-// const xscqActiveIcon = require('../assets/siderbarIcon/xscq_active.png');
-// const zsqkIcon = require('../assets/siderbarIcon/zsqk.png');
-// const zsqkActiveIcon = require('../assets/siderbarIcon/zsqk_active.png');
-// const zhglIcon = require('../assets/siderbarIcon/zhgl.png');
-// const zhglActiveIcon = require('../assets/siderbarIcon/zhgl_active.png');
+const xqfbIcon = require("../assets/siderbarIcon/xqfb.png");
+const xqfbActiveIcon = require("../assets/siderbarIcon/xqfb_active.png");
+const jscqIcon = require("../assets/siderbarIcon/jscq.png");
+const jscqActiveIcon = require("../assets/siderbarIcon/jscq_active.png");
+const xscqIcon = require("../assets/siderbarIcon/xscq.png");
+const xscqActiveIcon = require("../assets/siderbarIcon/xscq_active.png");
+const zsqkIcon = require("../assets/siderbarIcon/zsqk.png");
+const zsqkActiveIcon = require("../assets/siderbarIcon/zsqk_active.png");
+const xxglIcon = require("../assets/siderbarIcon/xxgl.png");
+const xxglActiveIcon = require("../assets/siderbarIcon/xxgl_active.png");
+const zhglIcon = require("../assets/siderbarIcon/zhgl.png");
+const zhglActiveIcon = require("../assets/siderbarIcon/zhgl_active.png");
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -54,15 +56,14 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    path: "/",
+    path: "/packToMap",
     component: Layout,
-    redirect: "/packToMap",
     children: [
       {
         path: "/packToMap",
         component: packToMap,
         name: "校区分布",
-        meta: { title: "校区分布", icon: "el-icon-s-flag" },
+        meta: { title: "校区分布", icon: xqfbIcon, activeIcon: xqfbActiveIcon },
       },
     ],
   },
@@ -74,7 +75,7 @@ export const constantRoutes = [
         path: "/packTeacher",
         component: teacherVisual,
         name: "教师出勤",
-        meta: { title: "教师出勤", icon: "el-icon-data-line" },
+        meta: { title: "教师出勤", icon: jscqIcon, activeIcon: jscqActiveIcon },
       },
     ],
   },
@@ -86,7 +87,7 @@ export const constantRoutes = [
         path: "/packStudent",
         component: studentsVisual,
         name: "学生出勤",
-        meta: { title: "学生出勤", icon: "el-icon-pie-chart" },
+        meta: { title: "学生出勤", icon: xscqIcon, activeIcon: xscqActiveIcon },
       },
     ],
   },
@@ -98,23 +99,23 @@ export const constantRoutes = [
         path: "/packGetStudents",
         component: getStudentsVisual,
         name: "招生情况",
-        meta: { title: "招生情况", icon: "el-icon-s-data" },
+        meta: { title: "招生情况", icon: zsqkIcon, activeIcon: zsqkActiveIcon },
       },
     ],
   },
   {
-    path: "",
+    path: "/parkLocalMam",
     component: Layout,
     children: [
       {
         path: "/parkLocalMam",
-        meta: { title: "校区管理", icon: "el-icon-school" },
+        meta: { title: "校区管理", icon: xxglIcon, activeIcon: xxglActiveIcon },
         component: parkLocal,
       },
       {
         path: "/parkLocalMam/updata",
         hidden: true,
-        meta: { title: "编辑", icon: "el-icon-school" },
+        meta: { title: "编辑" },
         component: () =>
           import("@/views/visualPack/parkLocal/modules/updataParkLocal"),
       },
@@ -128,7 +129,7 @@ export const constantRoutes = [
         path: "/principalMam",
         component: principal,
         name: "账号管理",
-        meta: { title: "账号管理", icon: "el-icon-s-custom" },
+        meta: { title: "账号管理", icon: zhglIcon, activeIcon: zhglActiveIcon },
       },
     ],
   },

@@ -1,43 +1,52 @@
 <template>
   <div id="statics">
     <div class="topMoudule">
-      <el-date-picker
-        value-format="yyyy-MM"
-        class="w180x dib"
-        v-model="time"
-        :clearable="false"
-        type="month"
-        size="mini"
-        placeholder="选择日期"
-      ></el-date-picker>
-      <el-select
-        size="mini"
-        class="w180x dib ml mr"
-        v-model="schoolStyle"
-        placeholder="请选择"
-      >
-        <el-option
-          v-for="item in schoolType"
-          :key="item.id"
-          align="center"
-          :label="item.label"
-          :value="item.id"
-        ></el-option>
-      </el-select>
-      <el-select
-        size="mini"
-        class="w180x dib ml"
-        v-model="schoolId"
-        placeholder="请选择"
-      >
-        <el-option
-          v-for="item in options"
-          :key="item.id"
-          :label="item.schoolName"
-          :value="item.id"
-        ></el-option>
-      </el-select>
-      <el-button class="dib" size="mini" @click="getData">查询</el-button>
+      <el-form inline label-position="right" label-width="80px" size="mini">
+        <el-form-item label="日期：">
+          <el-date-picker
+            value-format="yyyy-MM"
+            class="w180x dib"
+            v-model="time"
+            :clearable="false"
+            type="month"
+            size="mini"
+            placeholder="选择日期"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="学校类型：" label-width="100px">
+          <el-select
+            size="mini"
+            class="w180x dib ml mr"
+            v-model="schoolStyle"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in schoolType"
+              :key="item.id"
+              align="center"
+              :label="item.label"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学校：">
+          <el-select
+            size="mini"
+            class="w180x dib ml"
+            v-model="schoolId"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.schoolName"
+              :value="item.id"
+            ></el-option> </el-select
+        ></el-form-item>
+        <el-form-item>
+          <el-button class="dib" size="mini" @click="getData">查询</el-button>
+        </el-form-item>
+      </el-form>
     </div>
     <el-row class="layout-row">
       <el-col :span="10" :offset="1">
@@ -250,9 +259,10 @@ export default {
   display: flex;
 }
 .topMoudule {
-  margin: 20px 0 40px 56px;
-  * {
-    margin: 0 20px;
+  margin: 40px 0 20px 80px;
+  transform: translateX(-30px);
+  .ml {
+    margin-left: 30px;
   }
 }
 .block {

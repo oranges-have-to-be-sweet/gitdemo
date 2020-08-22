@@ -1,12 +1,17 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}">
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
     <transition name="sidebarLogoFade">
-      <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
+      <router-link
+        v-if="collapse"
+        key="collapse"
+        class="sidebar-logo-link"
+        to="/"
+      >
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
         <!-- <h1 v-else class="sidebar-title">{{ title }} </h1> -->
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
+        <img v-if="logo" :src="logo" class="sidebar-logo" />
         <!-- <h1 class="sidebar-title">{{ title }} </h1> -->
       </router-link>
     </transition>
@@ -15,7 +20,7 @@
 
 <script>
 export default {
-  name: 'SidebarLogo',
+  name: "SidebarLogo",
   props: {
     collapse: {
       type: Boolean,
@@ -25,10 +30,10 @@ export default {
   data() {
     return {
       // title: 'Vue Admin Template',
-      logo: require('@/assets/logo.png')
-    }
+      logo: require("@/assets/logo.png")
+    };
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -59,7 +64,6 @@ export default {
       width: 55px;
       height: 55px;
       vertical-align: middle;
-      margin-right: 12px;
     }
 
     & .sidebar-title {
