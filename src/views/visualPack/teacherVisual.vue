@@ -1,12 +1,18 @@
 <template>
   <div id="statics" :style="{ height: pageHeight + 'px', overflow: 'auto' }">
     <div class="topMoudule">
-      <el-form inline label-position="right" label-width="80px" size="mini">
+      <el-form
+        :model="dataQuery"
+        inline
+        label-position="right"
+        label-width="80px"
+        size="mini"
+      >
         <el-form-item label="日期：">
           <el-date-picker
             value-format="yyyy-MM"
             class="w180x dib"
-            v-model="time"
+            v-model="dataQuery.startTime"
             type="month"
             :clearable="false"
             placeholder="选择日期"
@@ -15,7 +21,7 @@
         <el-form-item label="学校类型：" label-width="100px">
           <el-select
             class="w180x dib mr"
-            v-model="schoolStyle"
+            v-model="dataQuery.schoolStyle"
             placeholder="请选择"
           >
             <el-option
@@ -30,11 +36,11 @@
         <el-form-item label="学校：">
           <el-select
             class="w180x dib mr"
-            v-model="schoolId"
+            v-model="dataQuery.schoolId"
             placeholder="请选择"
           >
             <el-option
-              v-for="item in options"
+              v-for="item in schoolList"
               :key="item.id"
               align="center"
               :label="item.schoolName"
@@ -104,6 +110,7 @@ import chart from "@/components/Charts/pieChart";
 import { mapState } from "vuex";
 import Pagination from "@/components/pagination";
 import { TimeSelect } from "element-ui";
+import global from "@/store/modules/global";
 export default {
   name: "Principal",
   components: {
@@ -127,20 +134,19 @@ export default {
       dataQuery: {
         compId: Number(sessionStorage.getItem("companyId")),
         startTime: "",
-        schoolId: "",
+        schoolId: 0,
         schoolStyle: 1,
         pageNum: 1,
         pageSize: 10
-      },
-      options: []
+      }
     };
   },
   mounted() {
-    this.init();
+    this.getData();
   },
   computed: {
     ...mapState({
-      schoolType: state => state["global"].schoolType
+      schoolList: state => state["global"].schoolList
     }),
     tableHeight() {
       return 550;
@@ -159,60 +165,30 @@ export default {
   watch: {
     schoolStyle: {
       handler(val) {
-        this.options = [];
         this.schoolId = 0;
-        this.getOptions();
       },
       immediate: true
     }
   },
   methods: {
-    init() {
+    getData() {
+      let _this = this;
+      let load = this.$loading({
+        target: document.querySelector("#statics"),
+        text: "加载中..."
+      });
+      this.$store.dispatch(
+        "global/a_setSchoolList",
+        this.dataQuery.schoolStyle
+      );
       let date = new Date();
       let num =
         Number(date.getMonth() + 1) > 10
           ? Number(date.getMonth() + 1)
           : "0" + Number(date.getMonth() + 1);
-      var str = date.getFullYear() + "-" + num;
-      this.time = str;
-      this.dataQuery.startTime = this.time;
-      this.getOptions().then(res => {
-        this.schoolId = this.options[0].id;
-        this.dataQuery.schoolId = this.schoolId;
-        this.getData();
-      });
-    },
-    getOptions() {
-      return new Promise((reslove, reject) => {
-        let params = {
-          userid: Number(sessionStorage.getItem("userId")),
-          compId: Number(sessionStorage.getItem("companyId")),
-          schoolStyle: this.schoolStyle
-        };
-        api.global.getParkSelectApi(params).then(res => {
-          if (res.status == 200) {
-            let arr = Object.assign([], res.data);
-            arr.unshift({
-              id: 0,
-              schoolName: "全部"
-            });
-            this.options = arr;
-            reslove(res);
-          }
-        });
-      });
-    },
-    getData() {
-      if (this.time == "") {
-        this.$message({
-          message: "请选择日期和学校"
-        });
-        return;
-      }
+      this.dataQuery.startTime = date.getFullYear() + "-" + num + "-01";
       let params = { ...this.dataQuery };
-      params.startTime = this.time + "-01";
-      params.schoolStyle = this.schoolStyle;
-      params.schoolId = this.schoolId;
+      // console.log(params);
       api.global.getSelectTeaKqApi(params).then(res => {
         if (res.status == 200) {
           let arr = [
@@ -224,6 +200,9 @@ export default {
           this.total = res.data.total;
           this.dataQuery.pageNum = res.data.pageNum;
           this.dataQuery.pageSize = res.data.pageSize;
+          load.close();
+        } else {
+          load.close();
         }
       });
     }

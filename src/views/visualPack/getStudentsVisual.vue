@@ -53,11 +53,11 @@
         <div class="mt">
           <chart
             v-if="chartData"
-            width="80%"
-            :chartData="chartData"
+            width="100%"
             height="600px"
+            :chartData="chartData"
           ></chart>
-          <div v-else class="nullData">暂无数据</div>
+          <div v-else class="nullData">加载中...</div>
         </div>
       </el-col>
       <el-col :span="10" :offset="1">
@@ -103,8 +103,8 @@
 </template>
 <script>
 import api from "@/api";
-import chart from "@/components/Charts/pieChart";
 import { mapState } from "vuex";
+import chart from "@/components/Charts/pieChart";
 import Pagination from "@/components/pagination";
 export default {
   name: "Principal",

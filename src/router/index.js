@@ -53,7 +53,7 @@ export const constantRoutes = [
   {
     path: "/login",
     component: () => import("@/views/login/index"),
-    hidden: true,
+    hidden: true
   },
   {
     path: "/packToMap",
@@ -63,9 +63,9 @@ export const constantRoutes = [
         path: "/packToMap",
         component: packToMap,
         name: "校区分布",
-        meta: { title: "校区分布", icon: xqfbIcon, activeIcon: xqfbActiveIcon },
-      },
-    ],
+        meta: { title: "校区分布", icon: xqfbIcon, activeIcon: xqfbActiveIcon }
+      }
+    ]
   },
   {
     path: "/packTeacher",
@@ -75,9 +75,9 @@ export const constantRoutes = [
         path: "/packTeacher",
         component: teacherVisual,
         name: "教师出勤",
-        meta: { title: "教师出勤", icon: jscqIcon, activeIcon: jscqActiveIcon },
-      },
-    ],
+        meta: { title: "教师出勤", icon: jscqIcon, activeIcon: jscqActiveIcon }
+      }
+    ]
   },
   {
     path: "/packStudent",
@@ -87,9 +87,9 @@ export const constantRoutes = [
         path: "/packStudent",
         component: studentsVisual,
         name: "学生出勤",
-        meta: { title: "学生出勤", icon: xscqIcon, activeIcon: xscqActiveIcon },
-      },
-    ],
+        meta: { title: "学生出勤", icon: xscqIcon, activeIcon: xscqActiveIcon }
+      }
+    ]
   },
   {
     path: "/packGetStudents",
@@ -99,9 +99,9 @@ export const constantRoutes = [
         path: "/packGetStudents",
         component: getStudentsVisual,
         name: "招生情况",
-        meta: { title: "招生情况", icon: zsqkIcon, activeIcon: zsqkActiveIcon },
-      },
-    ],
+        meta: { title: "招生情况", icon: zsqkIcon, activeIcon: zsqkActiveIcon }
+      }
+    ]
   },
   {
     path: "/parkLocalMam",
@@ -110,16 +110,16 @@ export const constantRoutes = [
       {
         path: "/parkLocalMam",
         meta: { title: "校区管理", icon: xxglIcon, activeIcon: xxglActiveIcon },
-        component: parkLocal,
+        component: parkLocal
       },
       {
         path: "/parkLocalMam/updata",
         hidden: true,
         meta: { title: "编辑" },
         component: () =>
-          import("@/views/visualPack/parkLocal/modules/updataParkLocal"),
-      },
-    ],
+          import("@/views/visualPack/parkLocal/modules/updataParkLocal")
+      }
+    ]
   },
   {
     path: "/principalMam",
@@ -129,14 +129,14 @@ export const constantRoutes = [
         path: "/principalMam",
         component: principal,
         name: "账号管理",
-        meta: { title: "账号管理", icon: zhglIcon, activeIcon: zhglActiveIcon },
-      },
-    ],
+        meta: { title: "账号管理", icon: zhglIcon, activeIcon: zhglActiveIcon }
+      }
+    ]
   },
   {
     path: "/404",
     component: () => import("@/views/404"),
-    hidden: true,
+    hidden: true
   },
   // {
   //   path: '/',
@@ -266,14 +266,14 @@ export const constantRoutes = [
   //   ]
   // },
   // 404 page must be placed at the end !!!
-  { path: "*", redirect: "/404", hidden: true },
+  { path: "*", redirect: "/404", hidden: true }
 ];
 
 const createRouter = () =>
   new Router({
     // mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes,
+    routes: constantRoutes
   });
 
 const router = createRouter();

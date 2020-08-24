@@ -14,12 +14,12 @@
         >
           <img
             :class="
-              $route.path != basePath
+              $route.path.indexOf(basePath) == -1
                 ? 'submenu-img'
                 : 'submenu-img-active submenu-img'
             "
             :src="
-              $route.path != basePath
+              $route.path.indexOf(basePath) == -1
                 ? onlyOneChild.meta.icon || (item.meta && item.meta.icon)
                 : onlyOneChild.meta.activeIcon ||
                   (item.meta && item.meta.activeIcon)

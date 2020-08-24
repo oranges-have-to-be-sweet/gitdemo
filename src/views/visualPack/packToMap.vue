@@ -8,7 +8,6 @@
 <script>
 import api from "@/api";
 import chart from "@/components/Map/chinaMap";
-// eslint-disable-next-line no-unused-vars
 import { mapState } from "vuex";
 export default {
   name: "",
@@ -43,7 +42,10 @@ export default {
             });
           } else {
             this.mapData = [];
-            // this.$message({type:'warning',message:'当前没有定位的园区'});
+            this.$message({
+              type: "warning",
+              message: "当前还没有定位的园区"
+            });
           }
           // console.log( 'yyt',this.mapData)
         }
