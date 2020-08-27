@@ -1,11 +1,8 @@
 <template>
   <div>
-    <el-input
-      size="mini"
-      v-model="address"
-      placeholder="请选择园区地址"
-      @focus="mapCpm"
-      >请选择校区地址</el-input
+    <!-- <el-input size="mini" v-model="address" @focus="">请选择校区地址</el-input> -->
+    <el-button size="mini" style="margin-left:20px;" @click="mapCpm"
+      >定位</el-button
     >
     <el-dialog
       :modal-append-to-body="true"
@@ -146,7 +143,7 @@ export default {
   watch: {
     mapData: {
       handler(val) {
-        console.log(val);
+        console.log(val, "11111111");
         let obj = {
           // center: new this.BMap.Point(val.longitude, val.latitude),
           center: {

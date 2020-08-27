@@ -138,11 +138,19 @@
       <div class="relationDom">
         <el-cascader
           :options="parkList"
-          :props="stuProps"
+          :props="{
+            multiple: true
+          }"
           v-model="relationForm.idList"
           :show-all-levels="false"
           placeholder="请选择学校(多选)"
-        ></el-cascader>
+        >
+          <!-- <template slot-scope="{ node, data }">
+            <div @click="getNode(node, data)">
+              <span>{{ data.label }}</span>
+            </div>
+          </template> -->
+        </el-cascader>
         <p style="margin-left:12px;color:#777;">
           当前账号绑定学校后，其他账号不能绑定该学校
         </p>
@@ -457,6 +465,9 @@ export default {
           });
           load.close();
         });
+    },
+    getNode(node, data) {
+      console.log(node, data);
     },
     openUpdata(data) {
       console.log(data.gardenInfo);

@@ -46,14 +46,14 @@ module.exports = {
         }
       },
       "/park": {
-        target: "http://218.244.149.172:8090",
+        target: "http://192.168.253.211:8090",
         changOrigin: true,
         pathRewrite: {
           "^/park": "/park"
         }
       },
       "/public": {
-        target: "http://218.244.149.172:8089",
+        target: "http://192.168.253.211:8089",
         changOrigin: true,
         pathRewrite: {
           "^/public": "/public"

@@ -20,11 +20,23 @@
         />
       </el-form-item>
       <el-form-item label="学校地址：" prop="address">
-        <chart
-          v-model="ruleForm.address"
-          :map-data="mapData"
-          @getPoint="getPoint"
-        />
+        <el-row>
+          <el-col :span="4">
+            <el-input
+              type="text"
+              size="mini"
+              @input="extendAddress"
+              placeholder="请选择园区地址"
+              v-model="ruleForm.address"
+            />
+          </el-col>
+          <el-col :span="2"
+            ><chart
+              v-model="ruleForm.address"
+              :map-data="mapData"
+              @getPoint="getPoint"
+          /></el-col>
+        </el-row>
       </el-form-item>
       <el-form-item label="学校类型：" prop="schoolStyle">
         <el-select
@@ -270,6 +282,11 @@ export default {
         load.close();
       }
     },
+    extendAddress(val) {
+      let data = Object.assign({}, this.mapData);
+      data.address = val;
+      this.mapData = data;
+    },
     findHasParentIds(arr) {
       const ids = [];
       for (const it of arr) {
@@ -462,6 +479,11 @@ export default {
 .btn-box {
   width: 100%;
   float: left;
+}
+.addressIpt {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #ccc;
 }
 .serachinput {
   width: 300px;
