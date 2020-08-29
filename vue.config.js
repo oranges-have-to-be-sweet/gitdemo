@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-const name = defaultSettings.title || "vue Admin Template"; // page title
+const name = "启龙图-智慧校园综合管理平台"; // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -46,7 +46,7 @@ module.exports = {
         }
       },
       "/park": {
-        target: "http://192.168.253.211:8090",
+        target: "http://218.244.149.172:8090",
         changOrigin: true,
         pathRewrite: {
           "^/park": "/park"
